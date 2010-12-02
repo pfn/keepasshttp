@@ -45,7 +45,7 @@ namespace KeePassHttp
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private IPluginHost host;
         private HttpListener listener;
-        private const int DEFAULT_PORT = 9455;
+        private const int DEFAULT_PORT = 19455;
         /// <summary>
         /// TODO make configurable
         /// </summary>
@@ -130,14 +130,14 @@ namespace KeePassHttp
 
         private void SetResponseVerifier(Response r, Aes aes)
         {
-            aes.IV = decode64(r.Nonce);
+            aes.GenerateIV();
+            r.Nonce = encode64(aes.IV);
             using (var enc = aes.CreateEncryptor())
             {
                 var bytes = Encoding.UTF8.GetBytes(r.Nonce);
                 var buf = enc.TransformFinalBlock(bytes, 0, bytes.Length);
                 r.Verifier = encode64(buf);
             }
-
         }
         private PwEntry GetConfigEntry(bool create)
         {
@@ -182,7 +182,7 @@ namespace KeePassHttp
             {
                 try
                 {
-                    var r = listener.BeginGetContext(new AsyncCallback(Listener), listener);
+                    var r = listener.BeginGetContext(new AsyncCallback(RequestHandler), listener);
                     r.AsyncWaitHandle.WaitOne();
                     r.AsyncWaitHandle.Close();
                 }
@@ -193,16 +193,12 @@ namespace KeePassHttp
         private Response ProcessRequest(Request r, HttpListenerResponse resp)
         {
             var response = new Response(r.RequestType);
-            var crypted = decode64(r.Verifier);
-            var iv      = decode64(r.Nonce);
 
             using (var aes = new AesManaged())
             {
                 var handler = handlers[r.RequestType];
                 if (handler != null)
                 {
-                    aes.GenerateIV();
-                    response.Nonce = encode64(aes.IV);
                     try
                     {
                         handler(r, response, aes);
@@ -211,14 +207,12 @@ namespace KeePassHttp
                     {
                         resp.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
-                    if (!response.Success)
-                        response.Nonce = null;
                 }
             }
 
             return response;
         }
-        private void Listener(IAsyncResult r)
+        private void RequestHandler(IAsyncResult r)
         {
             if (stopped) return;
             var l    = (HttpListener)r.AsyncState;
@@ -307,17 +301,6 @@ namespace KeePassHttp
         public const string ASSOCIATE      = "associate";
         public const string TEST_ASSOCIATE = "test-associate";
 
-        public Request(string request, string id, string nonce)
-        {
-            RequestType = request;
-            Id          = id;
-            Nonce       = nonce;
-            Verifier    = null;
-            Login       = null;
-            Password    = null;
-            Url         = null;
-            Key         = null;
-        }
         /// <summary>
         ///   Requests: 'get-login', 'set-login', 'associate', 'test-associate'
         /// </summary>
