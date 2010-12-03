@@ -55,7 +55,57 @@ namespace KeePassHttp
         private volatile bool stopped = false;
         Dictionary<string,RequestHandler> handlers = new Dictionary<string,RequestHandler>();
 
-        private void GetLoginHandler(Request r, Response resp, Aes aes)
+        private SearchParameters MakeSearchParameters()
+        {
+            var p = new SearchParameters();
+            p.SearchInTitles = true;
+            p.RegularExpression = true;
+            p.SearchInGroupNames = false;
+            p.SearchInNotes = false;
+            p.SearchInOther = false;
+            p.SearchInPasswords = false;
+            p.SearchInTags = false;
+            p.SearchInUrls = false;
+            p.SearchInUserNames = false;
+            p.SearchInUuids = false;
+            return p;
+        }
+
+        private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
+        {
+            if (!VerifyRequest(r, aes))
+                return;
+
+            var list = new PwObjectList<PwEntry>();
+
+            var root = host.Database.RootGroup;
+
+            var parms = MakeSearchParameters();
+
+            parms.SearchString = "\\."; // match anything look like a domain name
+
+            root.SearchEntries(parms, list, false);
+            foreach (var entry in list) {
+                var name = entry.Strings.Get(PwDefs.TitleField).ReadString();
+                var login = entry.Strings.Get(PwDefs.UserNameField).ReadString();
+                var uuid = entry.Uuid.ToHexString();
+                var e = new ResponseEntry(name, login, null, uuid);
+                resp.Entries.Add(e);
+            }
+            resp.Success = true;
+            resp.Id = r.Id;
+            SetResponseVerifier(resp, aes);
+            using (var enc = aes.CreateEncryptor())
+            {
+                foreach (var entry in resp.Entries)
+                {
+                    entry.Name  = CryptoTransform(entry.Name,  false, true, enc);
+                    entry.Login = CryptoTransform(entry.Login, false, true, enc);
+                    entry.Uuid  = CryptoTransform(entry.Uuid,  false, true, enc);
+                }
+            }
+        }
+        private void GetLoginsHandler(Request r, Response resp, Aes aes)
         {
         }
         private void SetLoginHandler(Request r, Response resp, Aes aes)
@@ -96,19 +146,23 @@ namespace KeePassHttp
 
         private void TestAssociateHandler(Request r, Response resp, Aes aes)
         {
-            var entry = GetConfigEntry(false);
-            if (entry == null)
-                return;
-            var s = entry.Strings.Get(r.Id);
-            if (s == null)
-                return;
-
-            if (!TestRequestVerifier(r, aes, s.ReadString()))
+            if (!VerifyRequest(r, aes))
                 return;
 
             resp.Success = true;
             resp.Id = r.Id;
             SetResponseVerifier(resp, aes);
+        }
+
+        private bool VerifyRequest(Request r, Aes aes) {
+            var entry = GetConfigEntry(false);
+            if (entry == null)
+                return false;
+            var s = entry.Strings.Get(r.Id);
+            if (s == null)
+                return false;
+
+            return TestRequestVerifier(r, aes, s.ReadString());
         }
 
         private bool TestRequestVerifier(Request r, Aes aes, string key)
@@ -134,10 +188,21 @@ namespace KeePassHttp
             r.Nonce = encode64(aes.IV);
             using (var enc = aes.CreateEncryptor())
             {
-                var bytes = Encoding.UTF8.GetBytes(r.Nonce);
-                var buf = enc.TransformFinalBlock(bytes, 0, bytes.Length);
-                r.Verifier = encode64(buf);
+                r.Verifier = CryptoTransform(r.Nonce, false, true, enc);
             }
+        }
+
+        private string CryptoTransform(string input, bool base64in, bool base64out, ICryptoTransform codec)
+        {
+            byte[] bytes;
+            if (base64in)
+                bytes = decode64(input);
+            else
+                bytes = Encoding.UTF8.GetBytes(input);
+
+            var buf = codec.TransformFinalBlock(bytes, 0, bytes.Length);
+
+            return base64out ? encode64(buf) : Encoding.UTF8.GetString(buf);
         }
         private PwEntry GetConfigEntry(bool create)
         {
@@ -163,7 +228,8 @@ namespace KeePassHttp
             {
                 handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
                 handlers.Add(Request.ASSOCIATE,      AssociateHandler);
-                handlers.Add(Request.GET_LOGIN,      GetLoginHandler);
+                handlers.Add(Request.GET_LOGINS,     GetLoginsHandler);
+                handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
                 handlers.Add(Request.SET_LOGIN,      SetLoginHandler);
 
                 listener = new HttpListener();
@@ -208,6 +274,10 @@ namespace KeePassHttp
                         resp.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
                 }
+                else
+                {
+                    resp.StatusCode = (int)HttpStatusCode.BadRequest;
+                }
             }
 
             return response;
@@ -237,38 +307,11 @@ namespace KeePassHttp
                     }
                     catch (JsonSerializationException) { } // ignore, bad request
                 }
-                var list = new PwObjectList<PwEntry>();
+
                 Response response = null;
                 if (request != null)
-                {
                     response = ProcessRequest(request, resp);
 
-                    if (request.Url != null)
-                    {
-                        try
-                        {
-                            var url = new Uri(request.Url);
-                        }
-                        catch (UriFormatException) { } // ignore, bad url
-                    }
-
-                    var root = db.RootGroup;
-                    var parms = new SearchParameters();
-
-                    parms.SearchInTitles = true;
-                    parms.RegularExpression = true;
-                    parms.SearchInGroupNames = false;
-                    parms.SearchInNotes = false;
-                    parms.SearchInOther = false;
-                    parms.SearchInPasswords = false;
-                    parms.SearchInTags = false;
-                    parms.SearchInUrls = false;
-                    parms.SearchInUserNames = false;
-                    parms.SearchInUuids = false;
-                    parms.SearchString = "google\\.com$";
-
-                    root.SearchEntries(parms, list, true);
-                }
                 resp.StatusCode = (int)HttpStatusCode.OK;
                 resp.ContentType = "application/json";
                 var writer = new StringWriter();
@@ -296,14 +339,12 @@ namespace KeePassHttp
     }
     public class Request
     {
-        public const string GET_LOGIN      = "get-login";
+        public const string GET_LOGINS     = "get-logins";
+        public const string GET_ALL_LOGINS = "get-all-logins";
         public const string SET_LOGIN      = "set-login";
         public const string ASSOCIATE      = "associate";
         public const string TEST_ASSOCIATE = "test-associate";
 
-        /// <summary>
-        ///   Requests: 'get-login', 'set-login', 'associate', 'test-associate'
-        /// </summary>
         public string RequestType;
 
         /// <summary>
@@ -344,8 +385,8 @@ namespace KeePassHttp
         {
             RequestType = request;
 
-            if (request == KeePassHttp.Request.GET_LOGIN)
-                Entries = new List<EntryResponse>();
+            if (request == Request.GET_LOGINS || request == Request.GET_ALL_LOGINS)
+                Entries = new List<ResponseEntry>();
             else
                 Entries = null;
         }
@@ -366,7 +407,7 @@ namespace KeePassHttp
         /// <summary>
         /// The resulting entries for a get-login request
         /// </summary>
-        public List<EntryResponse> Entries { get; private set; }
+        public List<ResponseEntry> Entries { get; private set; }
 
         /// <summary>
         /// Nonce value used in conjunction with all encrypted fields,
@@ -375,19 +416,23 @@ namespace KeePassHttp
         public string Nonce;
 
         /// <summary>
-        /// Same as Request.Verifier
+        /// Same purpose as Request.Verifier, but a new value
         /// </summary>
         public string Verifier;
     }
-    public class EntryResponse
+    public class ResponseEntry
     {
-        public EntryResponse() { }
-        public EntryResponse(string login, string password)
+        public ResponseEntry() { }
+        public ResponseEntry(string name, string login, string password, string uuid)
         {
             Login    = login;
             Password = password;
+            Uuid     = uuid;
+            Name     = name;
         }
         public string Login;
         public string Password;
+        public string Uuid;
+        public string Name;
     }
 }
