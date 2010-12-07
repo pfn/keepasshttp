@@ -172,7 +172,7 @@ namespace KeePassHttp {
                                             c = new KeePassHttpEntryConfig();
                                         var set = f.Allowed ? c.Allow : c.Deny;
                                         set.Add(host);
-                                        if (submithost != host)
+                                        if (submithost != null && submithost != host)
                                             set.Add(submithost);
                                         var writer = new StringWriter();
                                         serializer.Serialize(writer, c);
