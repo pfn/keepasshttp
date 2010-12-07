@@ -12,7 +12,7 @@ Prereqs:
 Build:
     1) msbuild
     or
-    1) C:\Full\Path\To\keepass.exe -plgx-create C:\Full\Path\To\KeePassHttp
+    1) C:\Full\Path\To\keepass.exe --plgx-create C:\Full\Path\To\KeePassHttp
 
 Install:
     1) Copy KeePassHttp.plgx to C:\Path\To\KeePass.exe\Dir
