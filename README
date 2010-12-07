@@ -28,6 +28,9 @@ Configuration:
        JSON string fields within the individual password
        entry in the database
 
+    1) Whenever events occur, the user is prompted either by tray
+       notification, or requesting interaction (accept/deny/remember)
+
 Protocol:
     1) New client or stale client (key not in database).  This is the only
        point at which an administrator snooping traffic will be able to
