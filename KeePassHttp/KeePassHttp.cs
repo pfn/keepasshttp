@@ -85,7 +85,7 @@ namespace KeePassHttp
                 entry.Uuid = uuid;
                 entry.Strings.Set(PwDefs.TitleField, new ProtectedString(false, KEEPASSHTTP_NAME));
                 root.AddEntry(entry, true);
-                host.MainWindow.UpdateUI(false, null, true, root, true, null, true);
+                UpdateUI(null);
             }
             return entry;
         }

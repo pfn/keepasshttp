@@ -325,6 +325,7 @@ namespace KeePassHttp {
                         resp.Id = f.KeyId;
                         resp.Success = true;
                         SetResponseVerifier(resp, aes);
+                        UpdateUI(null);
                     }
                 });
             }
