@@ -32,6 +32,7 @@ namespace KeePassHttp
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
+        private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
         private const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
         private IPluginHost host;
         private HttpListener listener;
@@ -118,7 +119,7 @@ namespace KeePassHttp
                     onclose(notify, null);
             };
 
-            notify.BalloonTipIcon = ToolTipIcon.Info;
+            //notify.BalloonTipIcon = ToolTipIcon.Info;
             notify.BalloonTipTitle = "KeePassHttp";
             notify.BalloonTipText = text;
             notify.ShowBalloonTip(5000);
@@ -191,7 +192,7 @@ namespace KeePassHttp
                     }
                     catch (Exception e)
                     {
-                        ShowNotification("Error: " + e);
+                        ShowNotification("***BUG*** " + e, (s,evt) => MessageBox.Show(host.MainWindow, e + ""));
                         resp.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
                 }
@@ -252,6 +253,19 @@ namespace KeePassHttp
             listener.Stop();
             listener.Close();
             httpThread.Interrupt();
+        }
+
+        private void UpdateUI(PwGroup group)
+        {
+            var win = host.MainWindow;
+            if (group == null) group = host.Database.RootGroup;
+            Delegate f = (MethodInvoker) delegate {
+                win.UpdateUI(false, null, true, group, true, null, true);
+            };
+            if (win.InvokeRequired)
+                win.Invoke(f);
+            else
+                f.DynamicInvoke(null);
         }
     }
 }

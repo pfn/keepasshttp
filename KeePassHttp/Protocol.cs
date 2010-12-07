@@ -70,10 +70,12 @@ namespace KeePassHttp
         public string RequestType;
 
         /// <summary>
-        /// Always encrypted, used with set-login
+        /// Always encrypted, used with set-login, uuid is set
+        /// if modifying an existing login
         /// </summary>
         public string Login;
         public string Password;
+        public string Uuid;
 
         /// <summary>
         /// Always encrypted, used with get and set-login
