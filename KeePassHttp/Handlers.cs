@@ -148,7 +148,7 @@ namespace KeePassHttp {
                     EventHandler onclose = delegate { wait.Set(); };
 
                     ShowNotification(String.Format(
-                            "{0}: {1} is requesting access, click to allow/disallow",
+                            "{0}: {1} is requesting access, click to allow or disallow",
                             r.Id, submithost != null ? submithost : host), onclick, onclose);
                     wait.WaitOne();
                     if (clicked)
@@ -256,8 +256,8 @@ namespace KeePassHttp {
                 var p = entry.Strings.ReadSafe(PwDefs.PasswordField);
                 if (u != username || p != password)
                 {
-                    ShowNotification(
-                        "You have a entry update prompt waiting, click to activate",
+                    ShowNotification(String.Format(
+                        "{0}:  You have a entry update prompt waiting, click to activate", r.Id),
                         (s, e) => host.MainWindow.Activate());
                     var result = MessageBox.Show(host.MainWindow,
                         String.Format("Do you want to update the username/password for {0}?", formhost),

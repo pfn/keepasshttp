@@ -1,0 +1,51 @@
+KeePassHttp plugin for KeePass
+
+Provides a secure means of exposing KeePass entries via HTTP for clients to
+consume.
+
+This plugin is primarily intended for use with KeePassFox
+
+Prereqs:
+    1) KeePass
+    2) Newtonsoft.Json (bundled 3.5r8)
+
+Build:
+    1) msbuild
+    or
+    1) C:\Full\Path\To\keepass.exe -plgx-create C:\Full\Path\To\KeePassHttp
+
+Install:
+    1) Copy KeePassHttp.plgx to C:\Path\To\KeePass.exe\Dir
+
+Configuration:
+    a) No explicit configuration is necessary
+    b) KeePassHttp stores shared AES encryption keys in
+       \"KeePassHttp Settings" in the password database
+    c) Password entries saved by KeePassHttp are stored in
+       \"KeePassHttp Passwords" within the password database,
+       feel free to move them from here or delete the group
+    d) Remembered Allow/Deny settings are stored in custom
+       JSON string fields within the individual password
+       entry in the database
+
+Protocol:
+    1) New client or stale client (key not in database).  This is the only
+       point at which an administrator snooping traffic will be able to
+       steal encryption keys:
+
+       a) client sends "test-associate" with payload to server
+       b) server sends fail response to client (cannot decrypt)
+       c) client sends "associate" with 256bit AES key and payload to server
+       d) server decrypts payload with provided key and prompts user to save
+       e) server saves key into "KeePassHttpSettings":"AES key: label"
+       f) client saves label/key into local password storage
+
+          (a) can be skipped if client does not have a key configured
+
+    2) Client with key stored in server
+       a) client sends "test-associate" with label+encrypted payload to server
+       b) server verifies payload and responds with success to client
+       c) client sends any of "get-logins-count", "get-logins", "set-login"
+          using the previously negotiated key in (1)
+       d) if any subsequent request fails, it is necessary to "test-associate"
+          again
