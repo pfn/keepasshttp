@@ -178,6 +178,7 @@ namespace KeePassHttp {
                                         var writer = new StringWriter();
                                         serializer.Serialize(writer, c);
                                         e.Strings.Set(KEEPASSHTTP_NAME, new ProtectedString(false, writer.ToString()));
+                                        e.Touch(true);
                                         UpdateUI(e.ParentGroup);
                                     }
                                 }
@@ -267,6 +268,7 @@ namespace KeePassHttp {
                     {
                         entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                         entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
+                        entry.Touch(true);
                         UpdateUI(entry.ParentGroup);
                     }
                 }
@@ -323,6 +325,7 @@ namespace KeePassHttp {
                     {
                         var entry = GetConfigEntry(true);
                         entry.Strings.Set(ASSOCIATE_KEY_PREFIX + f.KeyId, new ProtectedString(true, r.Key));
+                        entry.Touch(true);
                         resp.Id = f.KeyId;
                         resp.Success = true;
                         SetResponseVerifier(resp, aes);
