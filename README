@@ -4,6 +4,7 @@ Provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
 
 This plugin is primarily intended for use with KeePassFox
+    - https://github.com/pfn/keepassfox
 
 Prereqs:
     1) KeePass
