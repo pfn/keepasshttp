@@ -43,6 +43,8 @@ namespace KeePassHttp
             set
             {
                 EntriesBox.SelectionMode = SelectionMode.None;
+                Count = value.Count;
+                SetLabel();
                 foreach (var e in value)
                 {
                     var title = e.Strings.Get(PwDefs.TitleField).ReadString();
@@ -51,5 +53,26 @@ namespace KeePassHttp
                 }
             }
         }
+
+        public string Host
+        {
+            set
+            {
+                _Host = value;
+                SetLabel();
+            }
+        }
+
+        private void SetLabel()
+        {
+            if (_Host == null)
+                return;
+            ConfirmTextLabel.Text = String.Format(Message, _Host, Count == 1 ? "item" : "items");
+        }
+
+        private int Count = 0;
+        private const string Message = "{0} has requested access to passwords for the above {1}. " +
+            "Please select whether you want to allow access.";
+        private string _Host = null;
     }
 }

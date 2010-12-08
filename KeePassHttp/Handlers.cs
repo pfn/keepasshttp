@@ -148,7 +148,7 @@ namespace KeePassHttp {
                     EventHandler onclose = delegate { wait.Set(); };
 
                     ShowNotification(String.Format(
-                            "{0}: {1} is requesting access, click to allow or disallow",
+                            "{0}: {1} is requesting access, click to allow or deny",
                             r.Id, submithost != null ? submithost : host), onclick, onclose);
                     wait.WaitOne();
                     if (clicked)
@@ -160,6 +160,7 @@ namespace KeePassHttp {
                             {
                                 f.Icon = win.Icon;
                                 f.Entries = needPrompting.ToList();
+                                f.Host = submithost != null ? submithost : host;
                                 f.Load += delegate { f.Activate(); };
                                 f.ShowDialog(win);
                                 if (f.Remember && (f.Allowed || f.Denied))
