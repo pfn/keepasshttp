@@ -237,8 +237,8 @@ namespace KeePassHttp
                     }
                     catch (JsonSerializationException e) {
                         var buffer = Encoding.UTF8.GetBytes(e + "");
-                        resp.OutputStream.Write(buffer, 0, buffer.Length);
                         resp.StatusCode = (int)HttpStatusCode.BadRequest;
+                        resp.OutputStream.Write(buffer, 0, buffer.Length);
                     } // ignore, bad request
                 }
 
