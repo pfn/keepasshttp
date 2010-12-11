@@ -31,6 +31,8 @@ namespace KeePassHttp
                 0x34, 0x69, 0x7a, 0x40, 0x8a, 0x5b, 0x41, 0xc0,
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
+
+        private const int NOTIFICATION_TIME = 5000;
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
         private const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
@@ -99,33 +101,40 @@ namespace KeePassHttp
         }
         private void ShowNotification(string text, EventHandler onclick, EventHandler onclose)
         {
-            var notify = host.MainWindow.MainNotifyIcon;
-
-            EventHandler clicked = null;
-            EventHandler closed = null;
-
-            clicked = delegate
+            MethodInvoker m = delegate
             {
-                notify.BalloonTipClicked -= clicked;
-                notify.BalloonTipClosed -= closed;
-                if (onclick != null)
-                    onclick(notify, null);
-            };
-            closed = delegate
-            {
-                notify.BalloonTipClicked -= clicked;
-                notify.BalloonTipClosed -= closed;
-                if (onclose != null)
-                    onclose(notify, null);
-            };
+                var notify = host.MainWindow.MainNotifyIcon;
 
-            //notify.BalloonTipIcon = ToolTipIcon.Info;
-            notify.BalloonTipTitle = "KeePassHttp";
-            notify.BalloonTipText = text;
-            notify.ShowBalloonTip(5000);
-            // need to add listeners after showing, or closed is sent right away
-            notify.BalloonTipClosed += closed;
-            notify.BalloonTipClicked += clicked;
+                EventHandler clicked = null;
+                EventHandler closed = null;
+
+                clicked = delegate
+                {
+                    notify.BalloonTipClicked -= clicked;
+                    notify.BalloonTipClosed -= closed;
+                    if (onclick != null)
+                        onclick(notify, null);
+                };
+                closed = delegate
+                {
+                    notify.BalloonTipClicked -= clicked;
+                    notify.BalloonTipClosed -= closed;
+                    if (onclose != null)
+                        onclose(notify, null);
+                };
+
+                //notify.BalloonTipIcon = ToolTipIcon.Info;
+                notify.BalloonTipTitle = "KeePassHttp";
+                notify.BalloonTipText = text;
+                notify.ShowBalloonTip(NOTIFICATION_TIME);
+                // need to add listeners after showing, or closed is sent right away
+                notify.BalloonTipClosed += closed;
+                notify.BalloonTipClicked += clicked;
+            };
+            if (host.MainWindow.InvokeRequired)
+                host.MainWindow.Invoke(m);
+            else
+                m.Invoke();
         }
 
         public override bool Initialize(IPluginHost host)
@@ -193,11 +202,13 @@ namespace KeePassHttp
                     catch (Exception e)
                     {
                         ShowNotification("***BUG*** " + e, (s,evt) => MessageBox.Show(host.MainWindow, e + ""));
+                        response.Error = e + "";
                         resp.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
                 }
                 else
                 {
+                    response.Error = "Unknown command: " + r.RequestType;
                     resp.StatusCode = (int)HttpStatusCode.BadRequest;
                 }
             }
@@ -218,24 +229,32 @@ namespace KeePassHttp
                 var serializer = NewJsonSerializer();
                 Request request = null;
 
+                resp.StatusCode = (int)HttpStatusCode.OK;
                 using (var ins = new JsonTextReader(new StreamReader(req.InputStream))) {
                     try
                     {
                         request = serializer.Deserialize<Request>(ins);
                     }
-                    catch (JsonSerializationException) { } // ignore, bad request
+                    catch (JsonSerializationException e) {
+                        var buffer = Encoding.UTF8.GetBytes(e + "");
+                        resp.OutputStream.Write(buffer, 0, buffer.Length);
+                        resp.StatusCode = (int)HttpStatusCode.BadRequest;
+                    } // ignore, bad request
                 }
+
 
                 Response response = null;
                 if (request != null)
                     response = ProcessRequest(request, resp);
 
-                resp.StatusCode = (int)HttpStatusCode.OK;
                 resp.ContentType = "application/json";
                 var writer = new StringWriter();
-                serializer.Serialize(writer, response);
-                var buffer = Encoding.UTF8.GetBytes(writer.ToString());
-                resp.OutputStream.Write(buffer, 0, buffer.Length);
+                if (response != null)
+                {
+                    serializer.Serialize(writer, response);
+                    var buffer = Encoding.UTF8.GetBytes(writer.ToString());
+                    resp.OutputStream.Write(buffer, 0, buffer.Length);
+                }
             }
             else
             {
@@ -259,13 +278,13 @@ namespace KeePassHttp
         {
             var win = host.MainWindow;
             if (group == null) group = host.Database.RootGroup;
-            Delegate f = (MethodInvoker) delegate {
+            var f = (MethodInvoker) delegate {
                 win.UpdateUI(false, null, true, group, true, null, true);
             };
             if (win.InvokeRequired)
                 win.Invoke(f);
             else
-                f.DynamicInvoke(null);
+                f.Invoke();
         }
     }
 }

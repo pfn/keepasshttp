@@ -125,6 +125,8 @@ namespace KeePassHttp
         /// </summary>
         public string RequestType;
 
+        public string Error = null;
+
         public bool Success = false;
 
         /// <summary>

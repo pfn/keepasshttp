@@ -144,13 +144,17 @@ namespace KeePassHttp {
                 {
                     var wait = new ManualResetEvent(false);
                     var clicked = false;
-                    EventHandler onclick = delegate { clicked = true; wait.Set(); };
-                    EventHandler onclose = delegate { wait.Set(); };
+                    var delegated = false;
+                    EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
+                    EventHandler onclose = delegate { delegated = true; wait.Set(); };
 
                     ShowNotification(String.Format(
                             "{0}: {1} is requesting access, click to allow or deny",
                             r.Id, submithost != null ? submithost : host), onclick, onclose);
-                    wait.WaitOne();
+                    wait.WaitOne(2 * NOTIFICATION_TIME);
+                    if (!delegated)
+                        resp.Error = "Notification bubble did not appear";
+
                     if (clicked)
                     {
                         var win = this.host.MainWindow;
