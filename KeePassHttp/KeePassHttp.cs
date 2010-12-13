@@ -16,6 +16,7 @@ using KeePassLib.Collections;
 using KeePassLib.Security;
 
 using Newtonsoft.Json;
+using KeePass.Util.Spr;
 
 namespace KeePassHttp
 {
@@ -287,6 +288,24 @@ namespace KeePassHttp
                 win.Invoke(f);
             else
                 f.Invoke();
+        }
+
+        private string[] GetUserPass(PwEntry entry)
+        {
+            // follow references
+            string user = SprEngine.Compile(entry.Strings.ReadSafe(PwDefs.UserNameField), false, entry, host.Database, false, false);
+            string pass = SprEngine.Compile(entry.Strings.ReadSafe(PwDefs.PasswordField), false, entry, host.Database, false, false);
+            var f = (MethodInvoker)delegate
+            {
+                // apparently, SprEngine.Compile might modify the database
+                host.MainWindow.UpdateUI(false, null, false, null, false, null, false);
+            };
+            if (host.MainWindow.InvokeRequired)
+                host.MainWindow.Invoke(f);
+            else
+                f.Invoke();
+
+            return new string[] { user, pass };
         }
     }
 }

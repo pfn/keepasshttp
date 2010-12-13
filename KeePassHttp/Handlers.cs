@@ -33,7 +33,7 @@ namespace KeePassHttp {
             foreach (var entry in list)
             {
                 var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-                var login = entry.Strings.ReadSafe(PwDefs.UserNameField);
+                var login = GetUserPass(entry)[0];
                 var uuid = entry.Uuid.ToHexString();
                 var e = new ResponseEntry(name, login, null, uuid);
                 resp.Entries.Add(e);
@@ -200,8 +200,9 @@ namespace KeePassHttp {
                 foreach (var entry in items)
                 {
                     var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-                    var login = entry.Strings.ReadSafe(PwDefs.UserNameField);
-                    var passwd = entry.Strings.ReadSafe(PwDefs.PasswordField);
+                    var loginpass = GetUserPass(entry);
+                    var login = loginpass[0];
+                    var passwd = loginpass[1];
                     var uuid = entry.Uuid.ToHexString();
                     var e = new ResponseEntry(name, login, passwd, uuid);
                     resp.Entries.Add(e);
@@ -258,15 +259,16 @@ namespace KeePassHttp {
             {
                 // modify existing entry
                 PwEntry entry = host.Database.RootGroup.FindEntry(uuid, true);
-                var u = entry.Strings.ReadSafe(PwDefs.UserNameField);
-                var p = entry.Strings.ReadSafe(PwDefs.PasswordField);
+                string[] up = GetUserPass(entry);
+                var u = up[0];
+                var p = up[1];
                 if (u != username || p != password)
                 {
                     ShowNotification(String.Format(
-                        "{0}:  You have a entry update prompt waiting, click to activate", r.Id),
+                        "{0}:  You have an entry change prompt waiting, click to activate", r.Id),
                         (s, e) => host.MainWindow.Activate());
                     var result = MessageBox.Show(host.MainWindow,
-                        String.Format("Do you want to update the username/password for {0}?", formhost),
+                        String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
                         "Update Entry", MessageBoxButtons.YesNo);
                     if (result == DialogResult.Yes)
                     {
