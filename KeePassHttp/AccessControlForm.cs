@@ -48,7 +48,8 @@ namespace KeePassHttp
                 foreach (var e in value)
                 {
                     var title = e.Strings.Get(PwDefs.TitleField).ReadString();
-                    var username = e.Strings.Get(PwDefs.UserNameField).ReadString();
+                    var username = Plugin.GetUserPass(e)[0];
+
                     EntriesBox.Items.Add(title + " - " + username);
                 }
             }
@@ -74,5 +75,6 @@ namespace KeePassHttp
         private const string Message = "{0} has requested access to passwords for the above {1}. " +
             "Please select whether you want to allow access.";
         private string _Host = null;
+        internal KeePassHttpExt Plugin = null;
     }
 }

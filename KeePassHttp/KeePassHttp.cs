@@ -290,7 +290,7 @@ namespace KeePassHttp
                 f.Invoke();
         }
 
-        private string[] GetUserPass(PwEntry entry)
+        internal string[] GetUserPass(PwEntry entry)
         {
             // follow references
             string user = SprEngine.Compile(entry.Strings.ReadSafe(PwDefs.UserNameField), false, entry, host.Database, false, false);

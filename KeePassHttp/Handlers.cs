@@ -163,6 +163,7 @@ namespace KeePassHttp {
                             win.Invoke((MethodInvoker)delegate
                             {
                                 f.Icon = win.Icon;
+                                f.Plugin = this;
                                 f.Entries = needPrompting.ToList();
                                 f.Host = submithost != null ? submithost : host;
                                 f.Load += delegate { f.Activate(); };
