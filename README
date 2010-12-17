@@ -3,8 +3,9 @@ KeePassHttp plugin for KeePass
 Provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
 
-This plugin is primarily intended for use with KeePassFox
-    - https://github.com/pfn/keepassfox
+This plugin is primarily intended for use with PassIFox
+    - https://github.com/pfn/passifox
+    - https://github.com/pfn/passifox/raw/master/passifox.xpi (save as)
 
 Prereqs:
     1) KeePass
@@ -14,6 +15,9 @@ Build:
     1) msbuild
     or
     1) C:\Full\Path\To\keepass.exe --plgx-create C:\Full\Path\To\KeePassHttp
+
+Pre-built:
+    - https://github.com/pfn/keepasshttp/raw/master/KeePassHttp.plgx (save as)
 
 Install:
     1) Copy KeePassHttp.plgx to C:\Path\To\KeePass.exe\Dir
