@@ -55,24 +55,30 @@ namespace KeePassHttp {
         {
             Uri url;
             string submithost = null;
+            string realm = null;
             using (var dec = aes.CreateDecryptor())
             {
                 url = new Uri(CryptoTransform(r.Url, true, false, dec));
                 if (r.SubmitUrl != null)
                     submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, dec)).Host;
+                if (r.Realm != null)
+                    realm = CryptoTransform(r.Realm, true, false, dec);
             }
             var formhost = url.Host;
             var searchHost = url.Host;
+            var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
             var list = new PwObjectList<PwEntry>();
             var root = host.Database.RootGroup;
 
-            while (list.UCount == 0 && searchHost.IndexOf(".") != -1)
+            while (list.UCount == 0 && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
             {
                 parms.SearchString = String.Format("^{0}$|{0}/", searchHost);
                 root.SearchEntries(parms, list, false);
                 searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
+                if (searchHost == origSearchHost)
+                    break;
             }
             Func<PwEntry, bool> filter = delegate(PwEntry e)
             {
@@ -93,7 +99,20 @@ namespace KeePassHttp {
                 }
                 return url.Host.Contains(title);
             };
-            return from e in list where filter(e) select e;
+            Func<PwEntry, bool> matchRealm = delegate(PwEntry e)
+            {
+                var c = GetEntryConfig(e);
+                return c != null && c.Realm == realm;
+            };
+
+            var results = from e in list where filter(e) select e;
+            if (results.ToList().Count > 1)
+            {
+                var f = from e in results where matchRealm(e) select e;
+                if (f.ToList().Count > 0)
+                    return f;
+            }
+            return results;
         }
         private void GetLoginsCountHandler(Request r, Response resp, Aes aes)
         {
@@ -180,11 +199,8 @@ namespace KeePassHttp {
                                         set.Add(host);
                                         if (submithost != null && submithost != host)
                                             set.Add(submithost);
-                                        var writer = new StringWriter();
-                                        serializer.Serialize(writer, c);
-                                        e.Strings.Set(KEEPASSHTTP_NAME, new ProtectedString(false, writer.ToString()));
-                                        e.Touch(true);
-                                        UpdateUI(e.ParentGroup);
+                                        SetEntryConfig(e, c);
+
                                     }
                                 }
                                 if (!f.Allowed)
@@ -239,6 +255,7 @@ namespace KeePassHttp {
             string formhost, submithost = null;
             PwUuid uuid = null;
             string username, password;
+            string realm = null;
             using (var dec = aes.CreateDecryptor())
             {
                 Uri url = new Uri(CryptoTransform(r.Url, true, false, dec));
@@ -247,6 +264,9 @@ namespace KeePassHttp {
                     Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, dec));
                     submithost = submiturl.Host;
                 }
+                if (r.Realm != null)
+                    realm = CryptoTransform(r.Realm, true, false, dec);
+
                 username = CryptoTransform(r.Login, true, false, dec);
                 password = CryptoTransform(r.Password, true, false, dec);
                 if (r.Uuid != null)
@@ -296,10 +316,14 @@ namespace KeePassHttp {
                 entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                 entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
                 
-                if (submithost != null && formhost != submithost)
+                if ((submithost != null && formhost != submithost) || realm != null)
                 {
                     var config = new KeePassHttpEntryConfig();
-                    config.Allow.Add(submithost);
+                    if (submithost != null)
+                        config.Allow.Add(submithost);
+                    if (realm != null)
+                        config.Realm = realm;
+
                     var serializer = NewJsonSerializer();
                     var writer = new StringWriter();
                     serializer.Serialize(writer, config);
@@ -364,6 +388,15 @@ namespace KeePassHttp {
                 }
             }
             return null;
+        }
+        private void SetEntryConfig(PwEntry e, KeePassHttpEntryConfig c)
+        {
+            var serializer = NewJsonSerializer();
+            var writer = new StringWriter();
+            serializer.Serialize(writer, c);
+            e.Strings.Set(KEEPASSHTTP_NAME, new ProtectedString(false, writer.ToString()));
+            e.Touch(true);
+            UpdateUI(e.ParentGroup);
         }
     }
 }

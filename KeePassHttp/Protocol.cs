@@ -106,6 +106,11 @@ namespace KeePassHttp
         /// randomly generated for each request
         /// </summary>
         public string Nonce;
+
+        /// <summary>
+        /// Realm value used for filtering results.  Always encrypted.
+        /// </summary>
+        public string Realm;
     }
 
     public class Response
@@ -175,5 +180,6 @@ namespace KeePassHttp
     {
         public HashSet<string> Allow = new HashSet<string>();
         public HashSet<string> Deny = new HashSet<string>();
+        public string Realm = null;
     }
 }
