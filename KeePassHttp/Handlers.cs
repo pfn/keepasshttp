@@ -41,14 +41,11 @@ namespace KeePassHttp {
             resp.Success = true;
             resp.Id = r.Id;
             SetResponseVerifier(resp, aes);
-            using (var enc = aes.CreateEncryptor())
+            foreach (var entry in resp.Entries)
             {
-                foreach (var entry in resp.Entries)
-                {
-                    entry.Name = CryptoTransform(entry.Name, false, true, enc);
-                    entry.Login = CryptoTransform(entry.Login, false, true, enc);
-                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, enc);
-                }
+                entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+                entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+                entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
             }
         }
         private IEnumerable<PwEntry> FindMatchingEntries(Request r, Aes aes)
@@ -56,14 +53,11 @@ namespace KeePassHttp {
             Uri url;
             string submithost = null;
             string realm = null;
-            using (var dec = aes.CreateDecryptor())
-            {
-                url = new Uri(CryptoTransform(r.Url, true, false, dec));
-                if (r.SubmitUrl != null)
-                    submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, dec)).Host;
-                if (r.Realm != null)
-                    realm = CryptoTransform(r.Realm, true, false, dec);
-            }
+            url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            if (r.SubmitUrl != null)
+                submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT)).Host;
+            if (r.Realm != null)
+                realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
             var formhost = url.Host;
             var searchHost = url.Host;
             var origSearchHost = searchHost;
@@ -131,16 +125,13 @@ namespace KeePassHttp {
                 return;
 
             string host, submithost = null;
-            using (var dec = aes.CreateDecryptor()) {
-                Uri url = new Uri(CryptoTransform(r.Url, true, false, dec));
-                if (r.SubmitUrl != null)
-                {
-                    Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, dec));
-                    submithost = submiturl.Host;
-                }
-                host = url.Host;
-
+            Uri url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            if (r.SubmitUrl != null)
+            {
+                Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+                submithost = submiturl.Host;
             }
+            host = url.Host;
 
             var items = FindMatchingEntries(r, aes);
             if (items.ToList().Count > 0)
@@ -236,15 +227,12 @@ namespace KeePassHttp {
                 resp.Id = r.Id;
                 SetResponseVerifier(resp, aes);
 
-                using (var enc = aes.CreateEncryptor())
+                foreach (var entry in resp.Entries)
                 {
-                    foreach (var entry in resp.Entries)
-                    {
-                        entry.Name = CryptoTransform(entry.Name, false, true, enc);
-                        entry.Login = CryptoTransform(entry.Login, false, true, enc);
-                        entry.Uuid = CryptoTransform(entry.Uuid, false, true, enc);
-                        entry.Password = CryptoTransform(entry.Password, false, true, enc);
-                    }
+                    entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+                    entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
+                    entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
                 }
             }
         }
@@ -256,26 +244,23 @@ namespace KeePassHttp {
             PwUuid uuid = null;
             string username, password;
             string realm = null;
-            using (var dec = aes.CreateDecryptor())
+            Uri url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            if (r.SubmitUrl != null)
             {
-                Uri url = new Uri(CryptoTransform(r.Url, true, false, dec));
-                if (r.SubmitUrl != null)
-                {
-                    Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, dec));
-                    submithost = submiturl.Host;
-                }
-                if (r.Realm != null)
-                    realm = CryptoTransform(r.Realm, true, false, dec);
-
-                username = CryptoTransform(r.Login, true, false, dec);
-                password = CryptoTransform(r.Password, true, false, dec);
-                if (r.Uuid != null)
-                {
-                    uuid = new PwUuid(MemUtil.HexStringToByteArray(
-                            CryptoTransform(r.Uuid, true, false, dec)));
-                }
-                formhost = url.Host;
+                Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+                submithost = submiturl.Host;
             }
+            if (r.Realm != null)
+                realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
+
+            username = CryptoTransform(r.Login, true, false, aes, CMode.DECRYPT);
+            password = CryptoTransform(r.Password, true, false, aes, CMode.DECRYPT);
+            if (r.Uuid != null)
+            {
+                uuid = new PwUuid(MemUtil.HexStringToByteArray(
+                        CryptoTransform(r.Uuid, true, false, aes, CMode.DECRYPT)));
+            }
+            formhost = url.Host;
             if (uuid != null)
             {
                 // modify existing entry

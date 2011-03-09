@@ -22,6 +22,7 @@ namespace KeePassHttp
 {
     internal delegate void RequestHandler(Request request, Response response, Aes aes);
 
+    public enum CMode { ENCRYPT, DECRYPT }
     public sealed partial class KeePassHttpExt : Plugin
     {
 
@@ -65,7 +66,7 @@ namespace KeePassHttp
             return p;
         }
 
-        private string CryptoTransform(string input, bool base64in, bool base64out, ICryptoTransform codec)
+        private string CryptoTransform(string input, bool base64in, bool base64out, Aes cipher, CMode mode)
         {
             byte[] bytes;
             if (base64in)
@@ -73,9 +74,11 @@ namespace KeePassHttp
             else
                 bytes = Encoding.UTF8.GetBytes(input);
 
-            var buf = codec.TransformFinalBlock(bytes, 0, bytes.Length);
 
+            using (var c = mode == CMode.ENCRYPT ? cipher.CreateEncryptor() : cipher.CreateDecryptor()) {
+            var buf = c.TransformFinalBlock(bytes, 0, bytes.Length);
             return base64out ? encode64(buf) : Encoding.UTF8.GetString(buf);
+            }
         }
         private PwEntry GetConfigEntry(bool create)
         {
@@ -193,6 +196,8 @@ namespace KeePassHttp
 
             using (var aes = new AesManaged())
             {
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
                 var handler = handlers[r.RequestType];
                 if (handler != null)
                 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,13 +10,12 @@ namespace KeePassHttp
     {
         private static string encode64(byte[] b)
         {
-            // for some reason, a \n is prepended, chop it off
-            return new SoapBase64Binary(b).ToString().Substring(1);
+            return System.Convert.ToBase64String(b);
         }
 
         private static byte[] decode64(string s)
         {
-            return SoapBase64Binary.Parse(s).Value;
+            return System.Convert.FromBase64String(s);
         }
         private bool VerifyRequest(Request r, Aes aes)
         {
@@ -52,10 +50,7 @@ namespace KeePassHttp
         {
             aes.GenerateIV();
             r.Nonce = encode64(aes.IV);
-            using (var enc = aes.CreateEncryptor())
-            {
-                r.Verifier = CryptoTransform(r.Nonce, false, true, enc);
-            }
+            r.Verifier = CryptoTransform(r.Nonce, false, true, aes, CMode.ENCRYPT);
         }
     }
     public class Request
