@@ -180,7 +180,6 @@ namespace KeePassHttp {
                                 f.ShowDialog(win);
                                 if (f.Remember && (f.Allowed || f.Denied))
                                 {
-                                    var serializer = NewJsonSerializer();
                                     foreach (var e in needPrompting)
                                     {
                                         var c = GetEntryConfig(e);
