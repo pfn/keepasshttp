@@ -84,6 +84,8 @@ namespace KeePassHttp {
                         return true;
                     if (c.Deny.Contains(formhost) || (submithost != null && c.Deny.Contains(submithost)))
                         return false;
+                    if (realm != null && c.Realm != realm)
+                        return false;
                 }
 
                 if (title.StartsWith("http://") || title.StartsWith("https://"))
@@ -93,20 +95,8 @@ namespace KeePassHttp {
                 }
                 return url.Host.Contains(title);
             };
-            Func<PwEntry, bool> matchRealm = delegate(PwEntry e)
-            {
-                var c = GetEntryConfig(e);
-                return c != null && c.Realm == realm;
-            };
 
-            var results = from e in list where filter(e) select e;
-            if (results.ToList().Count > 1)
-            {
-                var f = from e in results where matchRealm(e) select e;
-                if (f.ToList().Count > 0)
-                    return f;
-            }
-            return results;
+            return from e in list where filter(e) select e;
         }
         private void GetLoginsCountHandler(Request r, Response resp, Aes aes)
         {
