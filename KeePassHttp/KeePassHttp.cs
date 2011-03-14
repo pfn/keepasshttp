@@ -60,7 +60,7 @@ namespace KeePassHttp
             p.SearchInOther = false;
             p.SearchInPasswords = false;
             p.SearchInTags = false;
-            p.SearchInUrls = false;
+            p.SearchInUrls = true;
             p.SearchInUserNames = false;
             p.SearchInUuids = false;
             return p;

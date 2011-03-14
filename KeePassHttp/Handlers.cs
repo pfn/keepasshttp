@@ -77,6 +77,7 @@ namespace KeePassHttp {
             Func<PwEntry, bool> filter = delegate(PwEntry e)
             {
                 var title = e.Strings.ReadSafe(PwDefs.TitleField);
+                var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
                 var c = GetEntryConfig(e);
                 if (c != null)
                 {
@@ -93,7 +94,12 @@ namespace KeePassHttp {
                     var u = new Uri(title);
                     return url.Host.Contains(u.Host);
                 }
-                return url.Host.Contains(title);
+                if (entryUrl != null && entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://"))
+                {
+                    var u = new Uri(entryUrl);
+                    return url.Host.Contains(u.Host);
+                }
+                return url.Host.Contains(title) || (entryUrl != null && url.Host.Contains(entryUrl));
             };
 
             return from e in list where filter(e) select e;
