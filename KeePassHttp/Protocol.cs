@@ -39,9 +39,11 @@ namespace KeePassHttp
 
             using (var dec = aes.CreateDecryptor())
             {
-                var buf = dec.TransformFinalBlock(crypted, 0, crypted.Length);
-                var value = Encoding.UTF8.GetString(buf);
-                success = value == r.Nonce;
+                try {
+                    var buf = dec.TransformFinalBlock(crypted, 0, crypted.Length);
+                    var value = Encoding.UTF8.GetString(buf);
+                    success = value == r.Nonce;
+                } catch (CryptographicException) { } // implicit failure
             }
             return success;
         }
