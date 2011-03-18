@@ -27,7 +27,7 @@ namespace KeePassHttp {
 
             var parms = MakeSearchParameters();
 
-            parms.SearchString = "^[A-Za-z0-9:/-]+.[A-Za-z0-9:/-]+$"; // match anything looking like a domain or url
+            parms.SearchString = @"^[A-Za-z0-9:/-]+\.[A-Za-z0-9:/-]+$"; // match anything looking like a domain or url
 
             root.SearchEntries(parms, list, false);
             foreach (var entry in list)
