@@ -214,8 +214,8 @@ namespace KeePassHttp {
                 if (items.ToList().Count > 0)
                 {
                     var names = (from e in resp.Entries select e.Name).Distinct<string>();
-                    var n = String.Join(", ", names.ToArray<string>());
-                    ShowNotification(String.Format("{0}: {1} is receiving credentials for {2}", r.Id, host, n));
+                    var n = String.Join("\n    ", names.ToArray<string>());
+                    ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
                 }
 
                 resp.Success = true;
