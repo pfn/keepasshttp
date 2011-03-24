@@ -157,7 +157,7 @@ namespace KeePassHttp {
                     ShowNotification(String.Format(
                             "{0}: {1} is requesting access, click to allow or deny",
                             r.Id, submithost != null ? submithost : host), onclick, onclose);
-                    wait.WaitOne(2 * NOTIFICATION_TIME);
+                    wait.WaitOne(GetNotificationTime() * 2);
                     if (!delegated)
                         resp.Error = "Notification bubble did not appear";
 

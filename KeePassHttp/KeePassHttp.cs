@@ -34,7 +34,7 @@ namespace KeePassHttp
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
 
-        private const int NOTIFICATION_TIME = 5000;
+        private const int DEFAULT_NOTIFICATION_TIME = 5000;
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
         private const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
@@ -95,6 +95,25 @@ namespace KeePassHttp
             }
             return entry;
         }
+        private int GetNotificationTime()
+        {
+            var time = DEFAULT_NOTIFICATION_TIME;
+            var entry = GetConfigEntry(false);
+            if (entry != null)
+            {
+                var s = entry.Strings.ReadSafe("Prompt Timeout");
+                if (s != null && s.Trim() != "")
+                {
+                    try
+                    {
+                        time = Int32.Parse(s) * 1000;
+                    }
+                    catch { }
+                }
+            }
+
+            return time;
+        }
         private void ShowNotification(string text)
         {
             ShowNotification(text, null, null);
@@ -130,7 +149,7 @@ namespace KeePassHttp
                 //notify.BalloonTipIcon = ToolTipIcon.Info;
                 notify.BalloonTipTitle = "KeePassHttp";
                 notify.BalloonTipText = text;
-                notify.ShowBalloonTip(NOTIFICATION_TIME);
+                notify.ShowBalloonTip(GetNotificationTime());
                 // need to add listeners after showing, or closed is sent right away
                 notify.BalloonTipClosed += closed;
                 notify.BalloonTipClicked += clicked;
