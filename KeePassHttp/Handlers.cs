@@ -53,9 +53,15 @@ namespace KeePassHttp {
             Uri url;
             string submithost = null;
             string realm = null;
-            url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
-            if (r.SubmitUrl != null)
-                submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT)).Host;
+            var list = new PwObjectList<PwEntry>();
+            try {
+                url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+                if (r.SubmitUrl != null) {
+                    submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT)).Host;
+                }
+            } catch {
+                return list;
+            }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
             var formhost = url.Host;
@@ -63,7 +69,6 @@ namespace KeePassHttp {
             var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
-            var list = new PwObjectList<PwEntry>();
             var root = host.Database.RootGroup;
 
             while (list.UCount == 0 && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
