@@ -166,19 +166,23 @@ namespace KeePassHttp
             this.host = host;
             if (httpSupported)
             {
-                handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
-                handlers.Add(Request.ASSOCIATE, AssociateHandler);
-                handlers.Add(Request.GET_LOGINS, GetLoginsHandler);
-                handlers.Add(Request.GET_LOGINS_COUNT, GetLoginsCountHandler);
-                handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
-                handlers.Add(Request.SET_LOGIN, SetLoginHandler);
+                try {
+                    handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
+                    handlers.Add(Request.ASSOCIATE, AssociateHandler);
+                    handlers.Add(Request.GET_LOGINS, GetLoginsHandler);
+                    handlers.Add(Request.GET_LOGINS_COUNT, GetLoginsCountHandler);
+                    handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
+                    handlers.Add(Request.SET_LOGIN, SetLoginHandler);
 
-                listener = new HttpListener();
-                listener.Prefixes.Add(HTTP_PREFIX + port + "/");
-                listener.Start();
+                    listener = new HttpListener();
+                    listener.Prefixes.Add(HTTP_PREFIX + port + "/");
+                    listener.Start();
 
-                httpThread = new Thread(new ThreadStart(Run));
-                httpThread.Start();
+                    httpThread = new Thread(new ThreadStart(Run));
+                    httpThread.Start();
+                } catch (HttpListenerException e) {
+                    MessageBox.Show(host.MainWindow, "Unable to start HttpListener: " + e);
+                }
             }
             else
             {
@@ -198,6 +202,9 @@ namespace KeePassHttp
                     r.AsyncWaitHandle.Close();
                 }
                 catch (ThreadInterruptedException) { }
+                catch (HttpListenerException e) {
+                    MessageBox.Show(host.MainWindow, "Unable to process request: " + e);
+                }
             }
         }
 
@@ -244,7 +251,13 @@ namespace KeePassHttp
         {
             if (stopped) return;
             var l    = (HttpListener)r.AsyncState;
-            var ctx  = l.EndGetContext(r);
+            HttpListenerContext ctx = null;
+            try {
+                ctx  = l.EndGetContext(r);
+            } catch (HttpListenerException e) {
+                MessageBox.Show(host.MainWindow, "Unable to get HttpListenerContext: " + e);
+                return;
+            }
             var req  = ctx.Request;
             var resp = ctx.Response;
 
