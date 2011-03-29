@@ -247,17 +247,19 @@ namespace KeePassHttp
 
             return response;
         }
-        private void RequestHandler(IAsyncResult r)
+        private void RequestHandler(IAsyncResult r) 
+        {
+            try {
+                _RequestHandler(r);
+            } catch (Exception e) {
+                MessageBox.Show(host.MainWindow, "RequestHandler failed: " + e);
+            }
+        }
+        private void _RequestHandler(IAsyncResult r)
         {
             if (stopped) return;
             var l    = (HttpListener)r.AsyncState;
-            HttpListenerContext ctx = null;
-            try {
-                ctx  = l.EndGetContext(r);
-            } catch (HttpListenerException e) {
-                MessageBox.Show(host.MainWindow, "Unable to get HttpListenerContext: " + e);
-                return;
-            }
+            var ctx  = l.EndGetContext(r);
             var req  = ctx.Request;
             var resp = ctx.Response;
 
