@@ -142,11 +142,12 @@ namespace KeePassHttp {
                     var c = GetEntryConfig(e);
 
                     var title = e.Strings.ReadSafe(PwDefs.TitleField);
+                    var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
                     if (c != null)
                     {
-                        return title != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title);
+                        return title != host && entryUrl != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title && submithost != entryUrl);
                     }
-                    return title != host && (submithost == null || title != submithost);
+                    return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
                 };
 
                 var needPrompting = from e in items where filter(e) select e;
