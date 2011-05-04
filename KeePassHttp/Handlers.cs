@@ -16,6 +16,20 @@ using Newtonsoft.Json;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin {
+        private string GetHost(string uri)
+        {
+            var host = uri;
+            try
+            {
+                var url = new Uri(uri);
+                host = url.Host;
+            }
+            catch
+            {
+                // ignore exception, not a URI, assume input is host
+            }
+            return host;
+        }
         private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -50,22 +64,21 @@ namespace KeePassHttp {
         }
         private IEnumerable<PwEntry> FindMatchingEntries(Request r, Aes aes)
         {
-            Uri url;
             string submithost = null;
             string realm = null;
             var list = new PwObjectList<PwEntry>();
+            string formhost, searchHost;
             try {
-                url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+                formhost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
                 if (r.SubmitUrl != null) {
-                    submithost = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT)).Host;
+                    submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
                 }
             } catch {
                 return list;
             }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
-            var formhost = url.Host;
-            var searchHost = url.Host;
+
             var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
@@ -97,14 +110,14 @@ namespace KeePassHttp {
                 if (title.StartsWith("http://") || title.StartsWith("https://"))
                 {
                     var u = new Uri(title);
-                    return url.Host.Contains(u.Host);
+                    return formhost.Contains(u.Host);
                 }
                 if (entryUrl != null && entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://"))
                 {
                     var u = new Uri(entryUrl);
-                    return url.Host.Contains(u.Host);
+                    return formhost.Contains(u.Host);
                 }
-                return url.Host.Contains(title) || (entryUrl != null && url.Host.Contains(entryUrl));
+                return formhost.Contains(title) || (entryUrl != null && formhost.Contains(entryUrl));
             };
 
             return from e in list where filter(e) select e;
@@ -125,14 +138,10 @@ namespace KeePassHttp {
             if (!VerifyRequest(r, aes))
                 return;
 
-            string host, submithost = null;
-            Uri url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            string submithost = null;
+            var host = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
             if (r.SubmitUrl != null)
-            {
-                Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
-                submithost = submiturl.Host;
-            }
-            host = url.Host;
+                submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
 
             var items = FindMatchingEntries(r, aes);
             if (items.ToList().Count > 0)
@@ -241,16 +250,13 @@ namespace KeePassHttp {
         {
             if (!VerifyRequest(r, aes))
                 return;
-            string formhost, submithost = null;
+            string submithost = null;
             PwUuid uuid = null;
             string username, password;
             string realm = null;
-            Uri url = new Uri(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            var formhost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
             if (r.SubmitUrl != null)
-            {
-                Uri submiturl = new Uri(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
-                submithost = submiturl.Host;
-            }
+                submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
 
@@ -261,7 +267,6 @@ namespace KeePassHttp {
                 uuid = new PwUuid(MemUtil.HexStringToByteArray(
                         CryptoTransform(r.Uuid, true, false, aes, CMode.DECRYPT)));
             }
-            formhost = url.Host;
             if (uuid != null)
             {
                 // modify existing entry
