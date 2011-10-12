@@ -68,13 +68,9 @@ namespace KeePassHttp {
             string realm = null;
             var list = new PwObjectList<PwEntry>();
             string formhost, searchHost;
-            try {
-                formhost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
-                if (r.SubmitUrl != null) {
-                    submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
-                }
-            } catch {
-                return list;
+            formhost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            if (r.SubmitUrl != null) {
+                submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
             }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
@@ -86,7 +82,7 @@ namespace KeePassHttp {
 
             while (list.UCount == 0 && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
             {
-                parms.SearchString = String.Format("^{0}$|{0}/", searchHost);
+                parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
                 root.SearchEntries(parms, list, true);
                 searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
                 if (searchHost == origSearchHost)
@@ -110,12 +106,14 @@ namespace KeePassHttp {
                 if (title.StartsWith("http://") || title.StartsWith("https://"))
                 {
                     var u = new Uri(title);
-                    return formhost.Contains(u.Host);
+                    if (formhost.Contains(u.Host))
+                        return true;
                 }
                 if (entryUrl != null && entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://"))
                 {
                     var u = new Uri(entryUrl);
-                    return formhost.Contains(u.Host);
+                    if (formhost.Contains(u.Host))
+                        return true;
                 }
                 return formhost.Contains(title) || (entryUrl != null && formhost.Contains(entryUrl));
             };
