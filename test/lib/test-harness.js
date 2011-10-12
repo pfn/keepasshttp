@@ -84,7 +84,7 @@ function assert_equals(a, b) {
 }
 
 
-function skiptest(tfn) { println("Skipping test: " + tfn.name } // noop
+function skiptest(tfn) { println("Skipping test: " + tfn.name) } // noop
 var test = (function() {
     var _tests = [];
     return function(tfn) {
