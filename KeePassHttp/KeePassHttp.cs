@@ -332,8 +332,12 @@ namespace KeePassHttp
         internal string[] GetUserPass(PwEntry entry)
         {
             // follow references
-            string user = SprEngine.Compile(entry.Strings.ReadSafe(PwDefs.UserNameField), false, entry, host.Database, false, false);
-            string pass = SprEngine.Compile(entry.Strings.ReadSafe(PwDefs.PasswordField), false, entry, host.Database, false, false);
+            SprContext ctx = new SprContext(entry, host.Database,
+                    SprCompileFlags.All, false, false);
+            string user = SprEngine.Compile(
+                    entry.Strings.ReadSafe(PwDefs.UserNameField), ctx);
+            string pass = SprEngine.Compile(
+                    entry.Strings.ReadSafe(PwDefs.PasswordField), ctx);
             var f = (MethodInvoker)delegate
             {
                 // apparently, SprEngine.Compile might modify the database

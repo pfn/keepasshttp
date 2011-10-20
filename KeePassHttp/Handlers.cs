@@ -43,7 +43,7 @@ namespace KeePassHttp {
 
             parms.SearchString = @"^[A-Za-z0-9:/-]+\.[A-Za-z0-9:/-]+$"; // match anything looking like a domain or url
 
-            root.SearchEntries(parms, list, true);
+            root.SearchEntries(parms, list);
             foreach (var entry in list)
             {
                 var name = entry.Strings.ReadSafe(PwDefs.TitleField);
@@ -83,7 +83,7 @@ namespace KeePassHttp {
             while (list.UCount == 0 && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
             {
                 parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
-                root.SearchEntries(parms, list, true);
+                root.SearchEntries(parms, list);
                 searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
                 if (searchHost == origSearchHost)
                     break;
