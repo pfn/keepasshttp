@@ -10,7 +10,7 @@ using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography;
 
 using KeePass.Plugins;
-
+using KeePass.UI;
 using KeePassLib;
 using KeePassLib.Collections;
 using KeePassLib.Security;
@@ -164,6 +164,11 @@ namespace KeePassHttp
         {
             var httpSupported = HttpListener.IsSupported;
             this.host = host;
+
+			var optionsMenu = new ToolStripMenuItem("KeePassHttp Options...");
+			optionsMenu.Click += OnOptions_Click;
+			this.host.MainWindow.ToolsMenu.DropDownItems.Add(optionsMenu);
+
             if (httpSupported)
             {
                 try {
@@ -191,7 +196,13 @@ namespace KeePassHttp
             return httpSupported;
         }
 
-        private void Run()
+    	void OnOptions_Click(object sender, EventArgs e)
+    	{
+    		var form = new OptionsForm(new ConfigOpt(host.CustomConfig));
+    		UIUtil.ShowDialogAndDestroy(form);
+    	}
+
+    	private void Run()
         {
             while (!stopped)
             {
