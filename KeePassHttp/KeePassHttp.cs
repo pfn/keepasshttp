@@ -165,9 +165,9 @@ namespace KeePassHttp
             var httpSupported = HttpListener.IsSupported;
             this.host = host;
 
-			var optionsMenu = new ToolStripMenuItem("KeePassHttp Options...");
-			optionsMenu.Click += OnOptions_Click;
-			this.host.MainWindow.ToolsMenu.DropDownItems.Add(optionsMenu);
+            var optionsMenu = new ToolStripMenuItem("KeePassHttp Options...");
+            optionsMenu.Click += OnOptions_Click;
+            this.host.MainWindow.ToolsMenu.DropDownItems.Add(optionsMenu);
 
             if (httpSupported)
             {
@@ -196,13 +196,13 @@ namespace KeePassHttp
             return httpSupported;
         }
 
-    	void OnOptions_Click(object sender, EventArgs e)
-    	{
-    		var form = new OptionsForm(new ConfigOpt(host.CustomConfig));
-    		UIUtil.ShowDialogAndDestroy(form);
-    	}
+        void OnOptions_Click(object sender, EventArgs e)
+        {
+            var form = new OptionsForm(new ConfigOpt(host.CustomConfig));
+            UIUtil.ShowDialogAndDestroy(form);
+        }
 
-    	private void Run()
+        private void Run()
         {
             while (!stopped)
             {
