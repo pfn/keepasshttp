@@ -55,6 +55,13 @@
     <Compile Include="AccessControlForm.Designer.cs">
       <DependentUpon>AccessControlForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigOpt.cs" />
+    <Compile Include="OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsForm.Designer.cs">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Protocol.cs" />
     <Compile Include="Handlers.cs" />
     <Compile Include="ConfirmAssociationForm.cs">
@@ -75,6 +82,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfirmAssociationForm.resx">
       <DependentUpon>ConfirmAssociationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsForm.resx">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

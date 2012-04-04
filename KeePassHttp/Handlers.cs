@@ -228,7 +228,10 @@ namespace KeePassHttp {
                 {
                     var names = (from e in resp.Entries select e.Name).Distinct<string>();
                     var n = String.Join("\n    ", names.ToArray<string>());
-                    ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
+
+                	var configOpt = new ConfigOpt(this.host.CustomConfig);
+					if (configOpt.ReceiveCredentialNotification)
+	                    ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
                 }
 
                 resp.Success = true;
