@@ -157,9 +157,12 @@ namespace KeePassHttp {
                     return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
                 };
 
+                var config = GetConfigEntry(true);
+                var autoAllowS = config.Strings.ReadSafe("Auto Allow");
+                var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
                 var needPrompting = from e in items where filter(e) select e;
   
-                if (needPrompting.ToList().Count > 0)
+                if (needPrompting.ToList().Count > 0 && !autoAllow)
                 {
                     var wait = new ManualResetEvent(false);
                     var clicked = false;
