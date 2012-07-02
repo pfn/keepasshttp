@@ -47,7 +47,11 @@ namespace KeePassHttp
                 SetLabel();
                 foreach (var e in value)
                 {
+                    if (e == null || e.Strings == null ||
+                            e.Strings.Get(PwDefs.TitleField) == null) continue;
                     var title = e.Strings.Get(PwDefs.TitleField).ReadString();
+                    if (Plugin == null || Plugin.GetUserPass(e) == null)
+                            continue;
                     var username = Plugin.GetUserPass(e)[0];
 
                     EntriesBox.Items.Add(title + " - " + username);
