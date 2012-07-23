@@ -8,10 +8,10 @@ This plugin is primarily intended for use with PassIFox and ChromeIPass
     - https://github.com/pfn/passifox/raw/master/passifox.xpi (save as)
     - alternate download link https://passifox.appspot.com/passifox.xpi
 
-Mono users:
+Mono and KeePass Portable users users:
     1) Download KeePassHttp.dll and Newtonsoft.Json.dll
     2) Copy into KeePass directory
-    3) You now have KeePassHttp working on Mono (Linux and Mac)
+    3) You now have KeePassHttp working on Mono (Linux and Mac, or portable)
 
 Prereqs:
     1) KeePass
