@@ -11,7 +11,11 @@ This plugin is primarily intended for use with PassIFox and ChromeIPass
 Mono and KeePass Portable users users:
     1) Download KeePassHttp.dll and Newtonsoft.Json.dll
     2) Copy into KeePass directory
-    3) You now have KeePassHttp working on Mono (Linux and Mac, or portable)
+    3) You now have KeePassHttp working on Mono (Linux and Mac, or portable)*
+
+    On some linux systems you need to install mono-complete.
+    E.g. on Ubuntu run:
+        $ apt-get install mono-complete
 
 Prereqs:
     1) KeePass
