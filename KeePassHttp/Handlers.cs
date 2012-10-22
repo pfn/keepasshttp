@@ -216,6 +216,78 @@ namespace KeePassHttp {
                     }
                 }
 
+                if (r.SortSelection == "true")
+                {
+                    string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
+                    if (sortHost.EndsWith("/"))
+                        sortHost = sortHost.Substring(0, sortHost.Length - 1);
+
+                    string sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                    if (sortSubmiturl == null)
+                        sortSubmiturl = String.Copy(sortHost);
+                    if (sortSubmiturl.EndsWith("/"))
+                        sortSubmiturl = sortSubmiturl.Substring(0, sortSubmiturl.Length - 1);
+
+                    if (!sortSubmiturl.Contains("://"))
+                        sortSubmiturl = "http://" + sortSubmiturl;
+                    if (!sortHost.Contains("://"))
+                        sortHost = "http://" + sortHost;
+
+                    string sortBaseSubmiturl = String.Copy(sortSubmiturl);
+                    if (sortSubmiturl.LastIndexOf("/") > 7)
+                    {
+                        Uri sortBaseSubmithostURI = new Uri(sortSubmiturl);
+                        sortBaseSubmiturl = String.Format("{0}{1}{2}{3}", sortBaseSubmithostURI.Scheme,
+                            Uri.SchemeDelimiter, sortBaseSubmithostURI.Authority, sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/")));
+                    }
+
+                    sortSubmiturl = sortSubmiturl.ToLower();
+                    sortHost = sortHost.ToLower();
+                    sortBaseSubmiturl = sortBaseSubmiturl.ToLower();
+
+                    foreach (var e in items)
+                    {
+                        string entryUrl = String.Copy(e.Strings.ReadSafe(PwDefs.UrlField));
+                        if (entryUrl.EndsWith("/"))
+                            entryUrl = entryUrl.Substring(0, entryUrl.Length - 1);
+                        entryUrl = entryUrl.ToLower();
+                        if (!entryUrl.Contains("://"))
+                            entryUrl = "http://" + entryUrl;
+
+                        string baseEntryUrl = String.Copy(entryUrl);
+                        if (baseEntryUrl.LastIndexOf("/") > 7)
+                        {
+                            Uri baseEntryUrlURI = new Uri(entryUrl);
+                            baseEntryUrl = String.Format("{0}{1}{2}{3}", baseEntryUrlURI.Scheme,
+                                Uri.SchemeDelimiter, baseEntryUrlURI.Authority, baseEntryUrlURI.AbsolutePath.Substring(0, baseEntryUrlURI.AbsolutePath.LastIndexOf("/")));
+                        }
+
+                        if (sortSubmiturl == entryUrl)
+                            e.UsageCount = 60;
+                        else if (sortHost == entryUrl)
+                            e.UsageCount = 50;
+                        else if (sortBaseSubmiturl == entryUrl)
+                            e.UsageCount = 40;
+                        else if (entryUrl.StartsWith(sortSubmiturl))
+                            e.UsageCount = 30;
+                        else if (entryUrl.StartsWith(sortBaseSubmiturl) && sortBaseSubmiturl != sortHost)
+                            e.UsageCount = 25;
+                        else if (sortSubmiturl.StartsWith(entryUrl))
+                            e.UsageCount = 20;
+                        else if (sortSubmiturl.StartsWith(baseEntryUrl))
+                            e.UsageCount = 15;
+                        else if (entryUrl.StartsWith(sortHost))
+                            e.UsageCount = 10;
+                        else if (sortHost.StartsWith(entryUrl))
+                            e.UsageCount = 5;
+                        else
+                            e.UsageCount = 0;
+                    }
+
+                    var items2 = from e in items orderby e.UsageCount descending select e;
+                    items = items2;
+                }
+
                 foreach (var entry in items)
                 {
                     var name = entry.Strings.ReadSafe(PwDefs.TitleField);
