@@ -67,6 +67,11 @@ namespace KeePassHttp
         public string RequestType;
 
         /// <summary>
+        /// Sort selection by best URL matching for given hosts
+        /// </summary>
+        public string SortSelection;
+
+        /// <summary>
         /// Always encrypted, used with set-login, uuid is set
         /// if modifying an existing login
         /// </summary>
