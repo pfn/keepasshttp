@@ -64,7 +64,12 @@ namespace KeePassHttp
         public const string ASSOCIATE = "associate";
         public const string TEST_ASSOCIATE = "test-associate";
 
-        public string RequestType;
+		public string RequestType;
+
+		/// <summary>
+		/// Sort selection by best URL matching for given hosts
+		/// </summary>
+		public string SortSelection;
 
         /// <summary>
         /// Always encrypted, used with set-login, uuid is set
