@@ -328,9 +328,10 @@ namespace KeePassHttp {
                 return;
             string submithost = null;
             PwUuid uuid = null;
-            string username, password;
+            string username, password, url;
             string realm = null;
-            var formhost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+			url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
+            var formhost = GetHost(url);
             if (r.SubmitUrl != null)
                 submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
             if (r.Realm != null)
@@ -380,8 +381,9 @@ namespace KeePassHttp {
 
                 PwEntry entry = new PwEntry(true, true);
                 entry.Strings.Set(PwDefs.TitleField, new ProtectedString(false, formhost));
-                entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
-                entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
+				entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
+				entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
+				entry.Strings.Set(PwDefs.UrlField, new ProtectedString(true, url));
                 
                 if ((submithost != null && formhost != submithost) || realm != null)
                 {
