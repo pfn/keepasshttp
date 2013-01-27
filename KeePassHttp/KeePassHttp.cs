@@ -34,6 +34,8 @@ namespace KeePassHttp
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
 
+		public override string UpdateUrl = "https://github.com/lspcity/keepasshttp/raw/master/update-version.txt";
+
         private const int DEFAULT_NOTIFICATION_TIME = 5000;
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
