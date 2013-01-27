@@ -34,8 +34,6 @@ namespace KeePassHttp
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
 
-		public override string UpdateUrl = "https://github.com/lspcity/keepasshttp/raw/master/update-version.txt";
-
         private const int DEFAULT_NOTIFICATION_TIME = 5000;
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
@@ -50,7 +48,10 @@ namespace KeePassHttp
         private const string HTTP_PREFIX = "http://localhost:";
         private Thread httpThread;
         private volatile bool stopped = false;
-        Dictionary<string,RequestHandler> handlers = new Dictionary<string,RequestHandler>();
+		Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
+
+		//public string UpdateUrl = "";
+		public override string UpdateUrl { get { return "https://raw.github.com/lspcity/keepasshttp/master/update-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
