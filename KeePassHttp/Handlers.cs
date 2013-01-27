@@ -157,9 +157,11 @@ namespace KeePassHttp {
                     return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
                 };
 
+				var configOpt = new ConfigOpt(this.host.CustomConfig);
                 var config = GetConfigEntry(true);
                 var autoAllowS = config.Strings.ReadSafe("Auto Allow");
                 var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
+				autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
                 var needPrompting = from e in items where filter(e) select e;
   
                 if (needPrompting.ToList().Count > 0 && !autoAllow)
@@ -216,7 +218,7 @@ namespace KeePassHttp {
                     }
 				}
 
-				if (r.SortSelection == "true")
+				if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
 				{
 					string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
 					if (sortHost.EndsWith("/"))
@@ -263,7 +265,11 @@ namespace KeePassHttp {
 						}
 
 						if (sortSubmiturl == entryUrl)
-							e.UsageCount = 60;
+							e.UsageCount = 90;
+						else if (sortSubmiturl.StartsWith(entryUrl) && sortHost != entryUrl && sortBaseSubmiturl != entryUrl)
+							e.UsageCount = 80;
+						else if (sortSubmiturl.StartsWith(baseEntryUrl) && sortHost != baseEntryUrl && sortBaseSubmiturl != baseEntryUrl)
+							e.UsageCount = 70;
 						else if (sortHost == entryUrl)
 							e.UsageCount = 50;
 						else if (sortBaseSubmiturl == entryUrl)
@@ -281,30 +287,54 @@ namespace KeePassHttp {
 						else if (sortHost.StartsWith(entryUrl))
 							e.UsageCount = 5;
 						else
-							e.UsageCount = 0;
+							e.UsageCount = 1;
 					}
 
 					var items2 = from e in items orderby e.UsageCount descending select e;
 					items = items2;
 				}
 
-                foreach (var entry in items)
-                {
-                    var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-                    var loginpass = GetUserPass(entry);
-                    var login = loginpass[0];
-                    var passwd = loginpass[1];
-                    var uuid = entry.Uuid.ToHexString();
-                    var e = new ResponseEntry(name, login, passwd, uuid);
-                    resp.Entries.Add(e);
-                }
+				if (configOpt.SpecificMatchingOnly)
+				{
+					ulong highestCount = 0;
+					foreach (var entry in items)
+					{
+						if (highestCount == 0)
+						{
+							highestCount = entry.UsageCount;
+						}
+
+						if (entry.UsageCount == highestCount)
+						{
+							var name = entry.Strings.ReadSafe(PwDefs.TitleField);
+							var loginpass = GetUserPass(entry);
+							var login = loginpass[0];
+							var passwd = loginpass[1];
+							var uuid = entry.Uuid.ToHexString();
+							var e = new ResponseEntry(name, login, passwd, uuid);
+							resp.Entries.Add(e);
+						}
+					}
+				}
+				else
+				{
+					foreach (var entry in items)
+					{
+						var name = entry.Strings.ReadSafe(PwDefs.TitleField);
+						var loginpass = GetUserPass(entry);
+						var login = loginpass[0];
+						var passwd = loginpass[1];
+						var uuid = entry.Uuid.ToHexString();
+						var e = new ResponseEntry(name, login, passwd, uuid);
+						resp.Entries.Add(e);
+					}
+				}
 
                 if (items.ToList().Count > 0)
                 {
                     var names = (from e in resp.Entries select e.Name).Distinct<string>();
                     var n = String.Join("\n    ", names.ToArray<string>());
 
-                    var configOpt = new ConfigOpt(this.host.CustomConfig);
                     if (configOpt.ReceiveCredentialNotification)
                         ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
                 }
@@ -351,15 +381,25 @@ namespace KeePassHttp {
                 string[] up = GetUserPass(entry);
                 var u = up[0];
                 var p = up[1];
+				var configOpt = new ConfigOpt(this.host.CustomConfig);
+
                 if (u != username || p != password)
                 {
-                    ShowNotification(String.Format(
-                        "{0}:  You have an entry change prompt waiting, click to activate", r.Id),
-                        (s, e) => host.MainWindow.Activate());
-                    var result = MessageBox.Show(host.MainWindow,
-                        String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
-                        "Update Entry", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
+					bool allowUpdate = configOpt.AlwaysAllowUpdates;
+					if (!allowUpdate)
+					{
+						ShowNotification(String.Format(
+							"{0}:  You have an entry change prompt waiting, click to activate", r.Id),
+							(s, e) => host.MainWindow.Activate());
+						var result = MessageBox.Show(host.MainWindow,
+							String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
+							"Update Entry", MessageBoxButtons.YesNo);
+						if (result == DialogResult.Yes)
+						{
+							allowUpdate = true;
+						}
+					}
+                    if (allowUpdate)
                     {
                         entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                         entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
@@ -370,6 +410,7 @@ namespace KeePassHttp {
             }
             else
             {
+				// creating new entry
                 var root = host.Database.RootGroup;
                 var group = root.FindCreateGroup(KEEPASSHTTP_GROUP_NAME, false);
                 if (group == null)

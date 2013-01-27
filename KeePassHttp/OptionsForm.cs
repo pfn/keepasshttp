@@ -22,11 +22,17 @@ namespace KeePassHttp
 		private void OptionsForm_Load(object sender, EventArgs e)
 		{
 			credNotifyCheckbox.Checked = _config.ReceiveCredentialNotification;
+			credMatchingCheckbox.Checked = _config.SpecificMatchingOnly;
+			credAllowAccessCheckbox.Checked = _config.AlwaysAllowAccess;
+			credAllowUpdatesCheckbox.Checked = _config.AlwaysAllowUpdates;
 		}
 
 		private void okButton_Click(object sender, EventArgs e)
 		{
 			_config.ReceiveCredentialNotification = credNotifyCheckbox.Checked;
+			_config.SpecificMatchingOnly = credMatchingCheckbox.Checked;
+			_config.AlwaysAllowAccess = credAllowAccessCheckbox.Checked;
+			_config.AlwaysAllowUpdates = credAllowUpdatesCheckbox.Checked;
 		}
 	}
 }
