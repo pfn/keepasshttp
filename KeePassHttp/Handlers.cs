@@ -13,6 +13,7 @@ using KeePassLib.Utility;
 using KeePassLib;
 
 using Newtonsoft.Json;
+using Microsoft.Win32;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin {
@@ -30,6 +31,16 @@ namespace KeePassHttp {
             }
             return host;
         }
+		private bool isBalloonTipsEnabled()
+		{
+			int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+					"EnableBalloonTips",
+					1);
+			int enabledBalloonTipsUser = (int)Registry.GetValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+				 "EnableBalloonTips",
+				 1);
+			return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
+		}
         private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -163,21 +174,26 @@ namespace KeePassHttp {
                 var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
 				autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
                 var needPrompting = from e in items where filter(e) select e;
-  
+
                 if (needPrompting.ToList().Count > 0 && !autoAllow)
                 {
-                    var wait = new ManualResetEvent(false);
-                    var clicked = false;
-                    var delegated = false;
-                    EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
-                    EventHandler onclose = delegate { delegated = true; wait.Set(); };
+					var clicked = true;
 
-                    ShowNotification(String.Format(
-                            "{0}: {1} is requesting access, click to allow or deny",
-                            r.Id, submithost != null ? submithost : host), onclick, onclose);
-                    wait.WaitOne(GetNotificationTime() + 5000); // give a little time to fade
-                    if (!delegated)
-                        resp.Error = "Notification bubble did not appear";
+					if (isBalloonTipsEnabled())
+					{
+						clicked = false;
+						var wait = new ManualResetEvent(false);
+						var delegated = false;
+						EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
+						EventHandler onclose = delegate { delegated = true; wait.Set(); };
+
+						ShowNotification(String.Format(
+								"{0}: {1} is requesting access, click to allow or deny",
+								r.Id, submithost != null ? submithost : host), onclick, onclose);
+						wait.WaitOne(GetNotificationTime() + 5000); // give a little time to fade
+						if (!delegated)
+							resp.Error = "Notification bubble did not appear";
+					}
 
                     if (clicked)
                     {
@@ -384,21 +400,42 @@ namespace KeePassHttp {
 				var configOpt = new ConfigOpt(this.host.CustomConfig);
 
                 if (u != username || p != password)
-                {
+				{
 					bool allowUpdate = configOpt.AlwaysAllowUpdates;
+
 					if (!allowUpdate)
 					{
-						ShowNotification(String.Format(
-							"{0}:  You have an entry change prompt waiting, click to activate", r.Id),
-							(s, e) => host.MainWindow.Activate());
-						var result = MessageBox.Show(host.MainWindow,
-							String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
-							"Update Entry", MessageBoxButtons.YesNo);
+						if (isBalloonTipsEnabled())
+						{
+							ShowNotification(String.Format(
+								"{0}:  You have an entry change prompt waiting, click to activate", r.Id),
+								(s, e) => host.MainWindow.Activate());
+						}
+
+						DialogResult result;
+						if (host.MainWindow.IsTrayed())
+						{
+							result = MessageBox.Show(
+								String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
+								"Update Entry", MessageBoxButtons.YesNo,
+								MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+						}
+						else
+						{
+							result = MessageBox.Show(
+								host.MainWindow,
+								String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
+								"Update Entry", MessageBoxButtons.YesNo,
+								MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+						}
+						
+
 						if (result == DialogResult.Yes)
 						{
 							allowUpdate = true;
 						}
 					}
+
                     if (allowUpdate)
                     {
                         entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));

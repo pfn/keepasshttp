@@ -60,6 +60,7 @@
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label1.ForeColor = System.Drawing.Color.Red;
 			this.label1.Location = new System.Drawing.Point(8, 97);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(346, 13);
@@ -91,10 +92,10 @@
 			this.credMatchingCheckbox.AutoSize = true;
 			this.credMatchingCheckbox.Location = new System.Drawing.Point(8, 47);
 			this.credMatchingCheckbox.Name = "credMatchingCheckbox";
-			this.credMatchingCheckbox.Size = new System.Drawing.Size(301, 30);
+			this.credMatchingCheckbox.Size = new System.Drawing.Size(254, 30);
 			this.credMatchingCheckbox.TabIndex = 1;
-			this.credMatchingCheckbox.Text = "&Return only specific matching for URL instead of all entries\r\nfor the whole doma" +
-    "in";
+			this.credMatchingCheckbox.Text = "&Return only specific matching entries for an URL\r\ninstead of all entries for the" +
+    " whole domain";
 			this.credMatchingCheckbox.UseVisualStyleBackColor = true;
 			// 
 			// credNotifyCheckbox
