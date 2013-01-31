@@ -437,10 +437,14 @@ namespace KeePassHttp {
 					}
 
                     if (allowUpdate)
-                    {
+					{
+						PwObjectList<PwEntry> m_vHistory = entry.History.CloneDeep();
+						entry.History = m_vHistory;
+						entry.CreateBackup(null);
+
                         entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                         entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
-                        entry.Touch(true);
+                        entry.Touch(true, false);
                         UpdateUI(entry.ParentGroup);
                     }
                 }
