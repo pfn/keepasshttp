@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 
 using KeePass.Plugins;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace KeePassHttp
 {
@@ -125,14 +127,18 @@ namespace KeePassHttp
                 Entries = new List<ResponseEntry>();
             else
                 Entries = null;
+
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+			this.Version = fvi.ProductVersion;
         }
 
         /// <summary>
         /// Mirrors the request type of KeePassRequest
         /// </summary>
-        public string RequestType;
+		public string RequestType;
 
-        public string Error = null;
+		public string Error = null;
 
         public bool Success = false;
 
@@ -140,12 +146,17 @@ namespace KeePassHttp
         /// The user selected string as a result of 'associate',
         /// always returned on every request
         /// </summary>
-        public string Id;
+		public string Id;
 
-        /// <summary>
-        /// response to get-logins-count, number of entries for requested Url
-        /// </summary>
-        public int Count = 0;
+		/// <summary>
+		/// response to get-logins-count, number of entries for requested Url
+		/// </summary>
+		public int Count = 0;
+
+		/// <summary>
+		/// response the current version of KeePassHttp
+		/// </summary>
+		public string Version = "";
 
         /// <summary>
         /// The resulting entries for a get-login request
