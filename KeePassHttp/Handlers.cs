@@ -31,6 +31,7 @@ namespace KeePassHttp {
             }
             return host;
         }
+
 		private bool isBalloonTipsEnabled()
 		{
 			int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
@@ -41,6 +42,7 @@ namespace KeePassHttp {
 				 1);
 			return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
 		}
+
         private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -73,6 +75,7 @@ namespace KeePassHttp {
                 entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
             }
         }
+
         private IEnumerable<PwEntry> FindMatchingEntries(Request r, Aes aes)
         {
             string submithost = null;
@@ -131,6 +134,7 @@ namespace KeePassHttp {
 
             return from e in list where filter(e) select e;
         }
+
         private void GetLoginsCountHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -142,6 +146,7 @@ namespace KeePassHttp {
             SetResponseVerifier(resp, aes);
             resp.Count = items.ToList().Count;
         }
+
         private void GetLoginsHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -355,10 +360,6 @@ namespace KeePassHttp {
                         ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
                 }
 
-                resp.Success = true;
-                resp.Id = r.Id;
-                SetResponseVerifier(resp, aes);
-
                 foreach (var entry in resp.Entries)
                 {
                     entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
@@ -366,8 +367,15 @@ namespace KeePassHttp {
                     entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
                     entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
                 }
-            }
+
+				resp.Count = resp.Entries.Count;
+			}
+
+			resp.Success = true;
+			resp.Id = r.Id;
+			SetResponseVerifier(resp, aes);
         }
+
         private void SetLoginHandler(Request r, Response resp, Aes aes)
         {
             if (!VerifyRequest(r, aes))
@@ -487,6 +495,7 @@ namespace KeePassHttp {
             resp.Id = r.Id;
             SetResponseVerifier(resp, aes);
         }
+
         private void AssociateHandler(Request r, Response resp, Aes aes)
         {
             if (!TestRequestVerifier(r, aes, r.Key))
@@ -517,15 +526,15 @@ namespace KeePassHttp {
             }
         }
 
-        private void TestAssociateHandler(Request r, Response resp, Aes aes)
-        {
-            if (!VerifyRequest(r, aes))
-                return;
+		private void TestAssociateHandler(Request r, Response resp, Aes aes)
+		{
+			if (!VerifyRequest(r, aes))
+				return;
 
-            resp.Success = true;
-            resp.Id = r.Id;
-            SetResponseVerifier(resp, aes);
-        }
+			resp.Success = true;
+			resp.Id = r.Id;
+			SetResponseVerifier(resp, aes);
+		}
 
         private KeePassHttpEntryConfig GetEntryConfig(PwEntry e)
         {

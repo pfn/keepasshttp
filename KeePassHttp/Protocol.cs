@@ -63,8 +63,8 @@ namespace KeePassHttp
         public const string GET_LOGINS_COUNT = "get-logins-count";
         public const string GET_ALL_LOGINS = "get-all-logins";
         public const string SET_LOGIN = "set-login";
-        public const string ASSOCIATE = "associate";
-        public const string TEST_ASSOCIATE = "test-associate";
+		public const string ASSOCIATE = "associate";
+		public const string TEST_ASSOCIATE = "test-associate";
 
 		public string RequestType;
 
@@ -119,7 +119,7 @@ namespace KeePassHttp
 
     public class Response
     {
-        public Response(string request)
+        public Response(string request, string hash)
         {
             RequestType = request;
 
@@ -131,6 +131,8 @@ namespace KeePassHttp
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 			this.Version = fvi.ProductVersion;
+
+			this.Hash = hash;
         }
 
         /// <summary>
@@ -157,6 +159,11 @@ namespace KeePassHttp
 		/// response the current version of KeePassHttp
 		/// </summary>
 		public string Version = "";
+
+		/// <summary>
+		/// response an unique hash of the database composed of RootGroup UUid and RecycleBin UUid
+		/// </summary>
+		public string Hash = "";
 
         /// <summary>
         /// The resulting entries for a get-login request
