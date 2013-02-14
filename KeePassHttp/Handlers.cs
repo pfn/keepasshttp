@@ -158,30 +158,30 @@ namespace KeePassHttp {
                 submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
 
             var items = FindMatchingEntries(r, aes);
-            if (items.ToList().Count > 0)
-            {
-                Func<PwEntry, bool> filter = delegate(PwEntry e)
-                {
-                    var c = GetEntryConfig(e);
+			if (items.ToList().Count > 0)
+			{
+				Func<PwEntry, bool> filter = delegate(PwEntry e)
+				{
+					var c = GetEntryConfig(e);
 
-                    var title = e.Strings.ReadSafe(PwDefs.TitleField);
-                    var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
-                    if (c != null)
-                    {
-                        return title != host && entryUrl != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title && submithost != entryUrl);
-                    }
-                    return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
-                };
+					var title = e.Strings.ReadSafe(PwDefs.TitleField);
+					var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
+					if (c != null)
+					{
+						return title != host && entryUrl != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title && submithost != entryUrl);
+					}
+					return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
+				};
 
 				var configOpt = new ConfigOpt(this.host.CustomConfig);
-                var config = GetConfigEntry(true);
-                var autoAllowS = config.Strings.ReadSafe("Auto Allow");
-                var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
+				var config = GetConfigEntry(true);
+				var autoAllowS = config.Strings.ReadSafe("Auto Allow");
+				var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
 				autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
-                var needPrompting = from e in items where filter(e) select e;
+				var needPrompting = from e in items where filter(e) select e;
 
-                if (needPrompting.ToList().Count > 0 && !autoAllow)
-                {
+				if (needPrompting.ToList().Count > 0 && !autoAllow)
+				{
 					var clicked = true;
 
 					if (isBalloonTipsEnabled())
@@ -200,43 +200,43 @@ namespace KeePassHttp {
 							resp.Error = "Notification bubble did not appear";
 					}
 
-                    if (clicked)
-                    {
-                        var win = this.host.MainWindow;
-                        using (var f = new AccessControlForm())
-                        {
-                            win.Invoke((MethodInvoker)delegate
-                            {
-                                f.Icon = win.Icon;
-                                f.Plugin = this;
-                                f.Entries = needPrompting.ToList();
-                                f.Host = submithost != null ? submithost : host;
-                                f.Load += delegate { f.Activate(); };
-                                f.ShowDialog(win);
-                                if (f.Remember && (f.Allowed || f.Denied))
-                                {
-                                    foreach (var e in needPrompting)
-                                    {
-                                        var c = GetEntryConfig(e);
-                                        if (c == null)
-                                            c = new KeePassHttpEntryConfig();
-                                        var set = f.Allowed ? c.Allow : c.Deny;
-                                        set.Add(host);
-                                        if (submithost != null && submithost != host)
-                                            set.Add(submithost);
-                                        SetEntryConfig(e, c);
+					if (clicked)
+					{
+						var win = this.host.MainWindow;
+						using (var f = new AccessControlForm())
+						{
+							win.Invoke((MethodInvoker)delegate
+							{
+								f.Icon = win.Icon;
+								f.Plugin = this;
+								f.Entries = needPrompting.ToList();
+								f.Host = submithost != null ? submithost : host;
+								f.Load += delegate { f.Activate(); };
+								f.ShowDialog(win);
+								if (f.Remember && (f.Allowed || f.Denied))
+								{
+									foreach (var e in needPrompting)
+									{
+										var c = GetEntryConfig(e);
+										if (c == null)
+											c = new KeePassHttpEntryConfig();
+										var set = f.Allowed ? c.Allow : c.Deny;
+										set.Add(host);
+										if (submithost != null && submithost != host)
+											set.Add(submithost);
+										SetEntryConfig(e, c);
 
-                                    }
-                                }
-                                if (!f.Allowed)
-                                    items = items.Except(needPrompting);
-                            });
-                        }
-                    }
-                    else
-                    {
-                        items = items.Except(needPrompting);
-                    }
+									}
+								}
+								if (!f.Allowed)
+									items = items.Except(needPrompting);
+							});
+						}
+					}
+					else
+					{
+						items = items.Except(needPrompting);
+					}
 				}
 
 				if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
@@ -351,29 +351,35 @@ namespace KeePassHttp {
 					}
 				}
 
-                if (items.ToList().Count > 0)
-                {
-                    var names = (from e in resp.Entries select e.Name).Distinct<string>();
-                    var n = String.Join("\n    ", names.ToArray<string>());
+				if (items.ToList().Count > 0)
+				{
+					var names = (from e in resp.Entries select e.Name).Distinct<string>();
+					var n = String.Join("\n    ", names.ToArray<string>());
 
-                    if (configOpt.ReceiveCredentialNotification)
-                        ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
-                }
+					if (configOpt.ReceiveCredentialNotification)
+						ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
+				}
 
-                foreach (var entry in resp.Entries)
-                {
-                    entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
-                    entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
-                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
-                    entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
-                }
+				resp.Success = true;
+				resp.Id = r.Id;
+				SetResponseVerifier(resp, aes);
+
+				foreach (var entry in resp.Entries)
+				{
+					entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+					entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+					entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
+					entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
+				}
 
 				resp.Count = resp.Entries.Count;
 			}
-
-			resp.Success = true;
-			resp.Id = r.Id;
-			SetResponseVerifier(resp, aes);
+			else
+			{
+				resp.Success = true;
+				resp.Id = r.Id;
+				SetResponseVerifier(resp, aes);
+			}
         }
 
         private void SetLoginHandler(Request r, Response resp, Aes aes)
