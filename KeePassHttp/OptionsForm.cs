@@ -25,6 +25,7 @@ namespace KeePassHttp
 			credMatchingCheckbox.Checked = _config.SpecificMatchingOnly;
 			credAllowAccessCheckbox.Checked = _config.AlwaysAllowAccess;
 			credAllowUpdatesCheckbox.Checked = _config.AlwaysAllowUpdates;
+			credSearchInAllOpenedDatabases.Checked = _config.SearchInAllOpenedDatabases;
 		}
 
 		private void okButton_Click(object sender, EventArgs e)
@@ -33,6 +34,7 @@ namespace KeePassHttp
 			_config.SpecificMatchingOnly = credMatchingCheckbox.Checked;
 			_config.AlwaysAllowAccess = credAllowAccessCheckbox.Checked;
 			_config.AlwaysAllowUpdates = credAllowUpdatesCheckbox.Checked;
+			_config.SearchInAllOpenedDatabases = credSearchInAllOpenedDatabases.Checked;
 		}
 	}
 }

@@ -14,6 +14,7 @@ using KeePassLib;
 
 using Newtonsoft.Json;
 using Microsoft.Win32;
+using KeePass.UI;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin {
@@ -92,16 +93,42 @@ namespace KeePassHttp {
             var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
-            var root = host.Database.RootGroup;
+			PwObjectList<PwGroup> listDatabases = new PwObjectList<PwGroup>();
 
-            while (list.UCount == 0 && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
-            {
-                parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
-                root.SearchEntries(parms, list);
-                searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
-                if (searchHost == origSearchHost)
-                    break;
-            }
+			var configOpt = new ConfigOpt(this.host.CustomConfig);
+			if (configOpt.SearchInAllOpenedDatabases)
+			{
+				foreach (PwDocument doc in host.MainWindow.DocumentManager.Documents)
+				{
+					if (doc.Database.IsOpen)
+					{
+						listDatabases.Add(doc.Database.RootGroup);
+					}
+				}
+			}
+			else
+			{
+				listDatabases.Add(host.Database.RootGroup);
+			}
+
+			uint listCount = 0;
+			foreach (PwGroup group in listDatabases)
+			{
+				searchHost = origSearchHost;
+				//get all possible entries for given host-name
+				while (list.UCount == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
+				{
+					parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
+					group.SearchEntries(parms, list);
+					searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
+					//searchHost contains no dot --> prevent possible infinite loop
+					if (searchHost == origSearchHost)
+						break;
+				}
+				listCount = list.UCount;
+			}
+			
+
             Func<PwEntry, bool> filter = delegate(PwEntry e)
             {
                 var title = e.Strings.ReadSafe(PwDefs.TitleField);

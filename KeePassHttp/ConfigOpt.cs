@@ -9,6 +9,7 @@ namespace KeePassHttp
 		const string SpecificMatchingOnlyKey = "KeePassHttp_SpecificMatchingOnly";
 		const string AlwaysAllowAccessKey = "KeePassHttp_AlwaysAllowAccess";
 		const string AlwaysAllowUpdatesKey = "KeePassHttp_AlwaysAllowUpdates";
+		const string SearchInAllOpenedDatabasesKey = "KeePassHttp_SearchInAllOpenedDatabases";
 
 		public ConfigOpt(AceCustomConfig config)
 		{
@@ -37,6 +38,12 @@ namespace KeePassHttp
 		{
 			get { return _config.GetBool(AlwaysAllowUpdatesKey, false); }
 			set { _config.SetBool(AlwaysAllowUpdatesKey, value); }
+		}
+
+		public bool SearchInAllOpenedDatabases
+		{
+			get { return _config.GetBool(SearchInAllOpenedDatabasesKey, false); }
+			set { _config.SetBool(SearchInAllOpenedDatabasesKey, value); }
 		}
 	}
 }
