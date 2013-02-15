@@ -46,8 +46,8 @@ namespace KeePassHttp
         /// </summary>
         private int port = DEFAULT_PORT;
         private const string HTTP_PREFIX = "http://localhost:";
-		private const string HTTPS_PREFIX = "https://localhost:";
-		private int HTTPS_PORT = DEFAULT_PORT + 1;
+		//private const string HTTPS_PREFIX = "https://localhost:";
+		//private int HTTPS_PORT = DEFAULT_PORT + 1;
         private Thread httpThread;
         private volatile bool stopped = false;
 		Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
@@ -236,8 +236,6 @@ namespace KeePassHttp
         }
         private Response ProcessRequest(Request r, HttpListenerResponse resp)
         {
-			DateTime fileCreatedDate = File.GetCreationTime(@host.Database.IOConnectionInfo.Path);
-			//string identifier = Path.GetFileName(host.Database.IOConnectionInfo.Path) + host.Database.RootGroup.Uuid.ToHexString() + fileCreatedDate.ToString();
 			string hash = host.Database.RootGroup.Uuid.ToHexString() + host.Database.RecycleBinUuid.ToHexString();
 			hash = getSHA1(hash);
 

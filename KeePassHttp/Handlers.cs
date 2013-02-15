@@ -35,13 +35,19 @@ namespace KeePassHttp {
 
 		private bool isBalloonTipsEnabled()
 		{
-			int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-					"EnableBalloonTips",
-					1);
-			int enabledBalloonTipsUser = (int)Registry.GetValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-				 "EnableBalloonTips",
-				 1);
-			return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
+			// only use balloon tips on windows machines
+			if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == System.PlatformID.Win32S || Environment.OSVersion.Platform == System.PlatformID.Win32Windows)
+			{
+				int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+						"EnableBalloonTips",
+						1);
+				int enabledBalloonTipsUser = (int)Registry.GetValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+					 "EnableBalloonTips",
+					 1);
+				return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
+			}
+
+			return false;
 		}
 
         private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
