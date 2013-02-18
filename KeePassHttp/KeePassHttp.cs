@@ -46,9 +46,14 @@ namespace KeePassHttp
         /// </summary>
         private int port = DEFAULT_PORT;
         private const string HTTP_PREFIX = "http://localhost:";
+        //private const string HTTPS_PREFIX = "https://localhost:";
+        //private int HTTPS_PORT = DEFAULT_PORT + 1;
         private Thread httpThread;
         private volatile bool stopped = false;
-        Dictionary<string,RequestHandler> handlers = new Dictionary<string,RequestHandler>();
+        Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
+
+        //public string UpdateUrl = "";
+        public override string UpdateUrl { get { return "https://raw.github.com/lspcity/keepasshttp/master/update-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
@@ -171,7 +176,8 @@ namespace KeePassHttp
 
             if (httpSupported)
             {
-                try {
+                try
+                {
                     handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
                     handlers.Add(Request.ASSOCIATE, AssociateHandler);
                     handlers.Add(Request.GET_LOGINS, GetLoginsHandler);
@@ -181,17 +187,27 @@ namespace KeePassHttp
 
                     listener = new HttpListener();
                     listener.Prefixes.Add(HTTP_PREFIX + port + "/");
+                    //listener.Prefixes.Add(HTTPS_PREFIX + HTTPS_PORT + "/");
                     listener.Start();
 
                     httpThread = new Thread(new ThreadStart(Run));
                     httpThread.Start();
                 } catch (HttpListenerException e) {
-                    MessageBox.Show(host.MainWindow, "Unable to start HttpListener: " + e);
+                    MessageBox.Show(host.MainWindow,
+                        "Unable to start HttpListener!\nDo you really have only one installation of KeePassHttp in your KeePass-directory?\n\n" + e,
+                        "Unable to start HttpListener",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 }
             }
             else
             {
-                MessageBox.Show(host.MainWindow, "The .NET HttpListener is not supported on your OS");
+                MessageBox.Show(host.MainWindow, "The .NET HttpListener is not supported on your OS",
+                        ".NET HttpListener not supported",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
             }
             return httpSupported;
         }
@@ -214,7 +230,11 @@ namespace KeePassHttp
                 }
                 catch (ThreadInterruptedException) { }
                 catch (HttpListenerException e) {
-                    MessageBox.Show(host.MainWindow, "Unable to process request: " + e);
+                    MessageBox.Show(host.MainWindow, "Unable to process request!\n\n" + e,
+                        "Unable to process request",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 }
             }
         }
@@ -229,7 +249,10 @@ namespace KeePassHttp
         }
         private Response ProcessRequest(Request r, HttpListenerResponse resp)
         {
-            var response = new Response(r.RequestType);
+            string hash = host.Database.RootGroup.Uuid.ToHexString() + host.Database.RecycleBinUuid.ToHexString();
+            hash = getSHA1(hash);
+
+            var response = new Response(r.RequestType, hash);
 
             using (var aes = new AesManaged())
             {
@@ -360,6 +383,28 @@ namespace KeePassHttp
                 f.Invoke();
 
             return new string[] { user, pass };
+        }
+
+        /// <summary>
+        /// Liefert den SHA1 Hash 
+        /// </summary>
+        /// <param name="input">Eingabestring</param>
+        /// <returns>SHA1 Hash der Eingabestrings</returns>
+        private string getSHA1(string input)
+        {
+            //Umwandlung des Eingastring in den SHA1 Hash
+            System.Security.Cryptography.SHA1 sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            byte[] textToHash = Encoding.Default.GetBytes(input);
+            byte[] result = sha1.ComputeHash(textToHash);
+
+            //SHA1 Hash in String konvertieren
+            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            foreach (byte b in result)
+            {
+                s.Append(b.ToString("x2").ToLower());
+            }
+
+            return s.ToString();
         }
     }
 }

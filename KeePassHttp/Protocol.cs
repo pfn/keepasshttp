@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 
 using KeePass.Plugins;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace KeePassHttp
 {
@@ -64,12 +66,12 @@ namespace KeePassHttp
         public const string ASSOCIATE = "associate";
         public const string TEST_ASSOCIATE = "test-associate";
 
-		public string RequestType;
+        public string RequestType;
 
-		/// <summary>
-		/// Sort selection by best URL matching for given hosts
-		/// </summary>
-		public string SortSelection;
+        /// <summary>
+        /// Sort selection by best URL matching for given hosts
+        /// </summary>
+        public string SortSelection;
 
         /// <summary>
         /// Always encrypted, used with set-login, uuid is set
@@ -117,7 +119,7 @@ namespace KeePassHttp
 
     public class Response
     {
-        public Response(string request)
+        public Response(string request, string hash)
         {
             RequestType = request;
 
@@ -125,6 +127,12 @@ namespace KeePassHttp
                 Entries = new List<ResponseEntry>();
             else
                 Entries = null;
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            this.Version = fvi.ProductVersion;
+
+            this.Hash = hash;
         }
 
         /// <summary>
@@ -146,6 +154,16 @@ namespace KeePassHttp
         /// response to get-logins-count, number of entries for requested Url
         /// </summary>
         public int Count = 0;
+
+        /// <summary>
+        /// response the current version of KeePassHttp
+        /// </summary>
+        public string Version = "";
+
+        /// <summary>
+        /// response an unique hash of the database composed of RootGroup UUid and RecycleBin UUid
+        /// </summary>
+        public string Hash = "";
 
         /// <summary>
         /// The resulting entries for a get-login request

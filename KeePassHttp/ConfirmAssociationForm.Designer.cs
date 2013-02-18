@@ -51,15 +51,15 @@
             // 
             // label2
             // 
-            label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             label2.Location = new System.Drawing.Point(12, 78);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(440, 48);
             label2.TabIndex = 1;
             label2.Text = "You have received an association request for the above key. If you would like to " +
-                "allow it access to your KeePass database give it a unique name to identify and a" +
-                "ccept it.";
+    "allow it access to your KeePass database give it a unique name to identify and a" +
+    "ccept it.";
             // 
             // label3
             // 
@@ -81,8 +81,8 @@
             // 
             // KeyName
             // 
-            this.KeyName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.KeyName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.KeyName.Location = new System.Drawing.Point(102, 34);
             this.KeyName.Name = "KeyName";
             this.KeyName.Size = new System.Drawing.Size(350, 20);
@@ -91,7 +91,7 @@
             // Save
             // 
             this.Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Save.Location = new System.Drawing.Point(296, 167);
+            this.Save.Location = new System.Drawing.Point(296, 129);
             this.Save.Name = "Save";
             this.Save.Size = new System.Drawing.Size(75, 23);
             this.Save.TabIndex = 5;
@@ -102,7 +102,7 @@
             // Cancel
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Cancel.Location = new System.Drawing.Point(377, 167);
+            this.Cancel.Location = new System.Drawing.Point(377, 129);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 23);
             this.Cancel.TabIndex = 6;
@@ -112,9 +112,10 @@
             // 
             // ConfirmAssociationForm
             // 
+            this.AcceptButton = this.Save;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(464, 202);
+            this.ClientSize = new System.Drawing.Size(464, 164);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.Save);
             this.Controls.Add(this.KeyName);
