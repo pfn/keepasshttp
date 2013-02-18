@@ -15,6 +15,7 @@ using KeePassLib;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using KeePass.UI;
+using KeePass;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin {
@@ -33,8 +34,14 @@ namespace KeePassHttp {
             return host;
         }
 
-        private bool isBalloonTipsEnabled()
+        private bool canShowBalloonTips()
         {
+            // tray icon is not visible --> no balloon tips for it
+            if (Program.Config.UI.TrayIcon.ShowOnlyIfTrayed && !host.MainWindow.IsTrayed())
+            {
+                return false;
+            }
+
             // only use balloon tips on windows machines
             if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == System.PlatformID.Win32S || Environment.OSVersion.Platform == System.PlatformID.Win32Windows)
             {
@@ -217,7 +224,7 @@ namespace KeePassHttp {
                 {
                     var clicked = true;
 
-                    if (isBalloonTipsEnabled())
+                    if (canShowBalloonTips())
                     {
                         clicked = false;
                         var wait = new ManualResetEvent(false);
@@ -236,6 +243,7 @@ namespace KeePassHttp {
                     if (clicked)
                     {
                         var win = this.host.MainWindow;
+
                         using (var f = new AccessControlForm())
                         {
                             win.Invoke((MethodInvoker)delegate
@@ -452,7 +460,7 @@ namespace KeePassHttp {
 
                     if (!allowUpdate)
                     {
-                        if (isBalloonTipsEnabled())
+                        if (canShowBalloonTips())
                         {
                             ShowNotification(String.Format(
                                 "{0}:  You have an entry change prompt waiting, click to activate", r.Id),
