@@ -193,12 +193,21 @@ namespace KeePassHttp
                     httpThread = new Thread(new ThreadStart(Run));
                     httpThread.Start();
                 } catch (HttpListenerException e) {
-                    MessageBox.Show(host.MainWindow, "Unable to start HttpListener: " + e);
+                    MessageBox.Show(host.MainWindow,
+						"Unable to start HttpListener!\nDo you really have only one installation of KeePassHttp in your KeePass-directory?\n\n" + e,
+						"Unable to start HttpListener",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error
+					);
                 }
             }
             else
             {
-                MessageBox.Show(host.MainWindow, "The .NET HttpListener is not supported on your OS");
+                MessageBox.Show(host.MainWindow, "The .NET HttpListener is not supported on your OS",
+						".NET HttpListener not supported",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error
+					);
             }
             return httpSupported;
         }
@@ -221,7 +230,11 @@ namespace KeePassHttp
                 }
                 catch (ThreadInterruptedException) { }
                 catch (HttpListenerException e) {
-                    MessageBox.Show(host.MainWindow, "Unable to process request: " + e);
+                    MessageBox.Show(host.MainWindow, "Unable to process request!\n\n" + e,
+						"Unable to process request",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error
+					);
                 }
             }
         }
