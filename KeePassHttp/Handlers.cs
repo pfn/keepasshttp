@@ -33,22 +33,22 @@ namespace KeePassHttp {
             return host;
         }
 
-		private bool isBalloonTipsEnabled()
-		{
-			// only use balloon tips on windows machines
-			if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == System.PlatformID.Win32S || Environment.OSVersion.Platform == System.PlatformID.Win32Windows)
-			{
-				int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-						"EnableBalloonTips",
-						1);
-				int enabledBalloonTipsUser = (int)Registry.GetValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-					 "EnableBalloonTips",
-					 1);
-				return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
-			}
+        private bool isBalloonTipsEnabled()
+        {
+            // only use balloon tips on windows machines
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == System.PlatformID.Win32S || Environment.OSVersion.Platform == System.PlatformID.Win32Windows)
+            {
+                int enabledBalloonTipsMachine = (int)Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                        "EnableBalloonTips",
+                        1);
+                int enabledBalloonTipsUser = (int)Registry.GetValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                     "EnableBalloonTips",
+                     1);
+                return (enabledBalloonTipsMachine == 1 && enabledBalloonTipsUser == 1);
+            }
 
-			return false;
-		}
+            return false;
+        }
 
         private void GetAllLoginsHandler(Request r, Response resp, Aes aes)
         {
@@ -99,41 +99,41 @@ namespace KeePassHttp {
             var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
-			PwObjectList<PwGroup> listDatabases = new PwObjectList<PwGroup>();
+            PwObjectList<PwGroup> listDatabases = new PwObjectList<PwGroup>();
 
-			var configOpt = new ConfigOpt(this.host.CustomConfig);
-			if (configOpt.SearchInAllOpenedDatabases)
-			{
-				foreach (PwDocument doc in host.MainWindow.DocumentManager.Documents)
-				{
-					if (doc.Database.IsOpen)
-					{
-						listDatabases.Add(doc.Database.RootGroup);
-					}
-				}
-			}
-			else
-			{
-				listDatabases.Add(host.Database.RootGroup);
-			}
+            var configOpt = new ConfigOpt(this.host.CustomConfig);
+            if (configOpt.SearchInAllOpenedDatabases)
+            {
+                foreach (PwDocument doc in host.MainWindow.DocumentManager.Documents)
+                {
+                    if (doc.Database.IsOpen)
+                    {
+                        listDatabases.Add(doc.Database.RootGroup);
+                    }
+                }
+            }
+            else
+            {
+                listDatabases.Add(host.Database.RootGroup);
+            }
 
-			uint listCount = 0;
-			foreach (PwGroup group in listDatabases)
-			{
-				searchHost = origSearchHost;
-				//get all possible entries for given host-name
-				while (list.UCount == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
-				{
-					parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
-					group.SearchEntries(parms, list);
-					searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
-					//searchHost contains no dot --> prevent possible infinite loop
-					if (searchHost == origSearchHost)
-						break;
-				}
-				listCount = list.UCount;
-			}
-			
+            uint listCount = 0;
+            foreach (PwGroup group in listDatabases)
+            {
+                searchHost = origSearchHost;
+                //get all possible entries for given host-name
+                while (list.UCount == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
+                {
+                    parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
+                    group.SearchEntries(parms, list);
+                    searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
+                    //searchHost contains no dot --> prevent possible infinite loop
+                    if (searchHost == origSearchHost)
+                        break;
+                }
+                listCount = list.UCount;
+            }
+            
 
             Func<PwEntry, bool> filter = delegate(PwEntry e)
             {
@@ -191,228 +191,228 @@ namespace KeePassHttp {
                 submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
 
             var items = FindMatchingEntries(r, aes);
-			if (items.ToList().Count > 0)
-			{
-				Func<PwEntry, bool> filter = delegate(PwEntry e)
-				{
-					var c = GetEntryConfig(e);
+            if (items.ToList().Count > 0)
+            {
+                Func<PwEntry, bool> filter = delegate(PwEntry e)
+                {
+                    var c = GetEntryConfig(e);
 
-					var title = e.Strings.ReadSafe(PwDefs.TitleField);
-					var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
-					if (c != null)
-					{
-						return title != host && entryUrl != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title && submithost != entryUrl);
-					}
-					return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
-				};
+                    var title = e.Strings.ReadSafe(PwDefs.TitleField);
+                    var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
+                    if (c != null)
+                    {
+                        return title != host && entryUrl != host && !c.Allow.Contains(host) || (submithost != null && !c.Allow.Contains(submithost) && submithost != title && submithost != entryUrl);
+                    }
+                    return title != host && entryUrl != host || (submithost != null && title != submithost && entryUrl != submithost);
+                };
 
-				var configOpt = new ConfigOpt(this.host.CustomConfig);
-				var config = GetConfigEntry(true);
-				var autoAllowS = config.Strings.ReadSafe("Auto Allow");
-				var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
-				autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
-				var needPrompting = from e in items where filter(e) select e;
+                var configOpt = new ConfigOpt(this.host.CustomConfig);
+                var config = GetConfigEntry(true);
+                var autoAllowS = config.Strings.ReadSafe("Auto Allow");
+                var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
+                autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
+                var needPrompting = from e in items where filter(e) select e;
 
-				if (needPrompting.ToList().Count > 0 && !autoAllow)
-				{
-					var clicked = true;
+                if (needPrompting.ToList().Count > 0 && !autoAllow)
+                {
+                    var clicked = true;
 
-					if (isBalloonTipsEnabled())
-					{
-						clicked = false;
-						var wait = new ManualResetEvent(false);
-						var delegated = false;
-						EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
-						EventHandler onclose = delegate { delegated = true; wait.Set(); };
+                    if (isBalloonTipsEnabled())
+                    {
+                        clicked = false;
+                        var wait = new ManualResetEvent(false);
+                        var delegated = false;
+                        EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
+                        EventHandler onclose = delegate { delegated = true; wait.Set(); };
 
-						ShowNotification(String.Format(
-								"{0}: {1} is requesting access, click to allow or deny",
-								r.Id, submithost != null ? submithost : host), onclick, onclose);
-						wait.WaitOne(GetNotificationTime() + 5000); // give a little time to fade
-						if (!delegated)
-							resp.Error = "Notification bubble did not appear";
-					}
+                        ShowNotification(String.Format(
+                                "{0}: {1} is requesting access, click to allow or deny",
+                                r.Id, submithost != null ? submithost : host), onclick, onclose);
+                        wait.WaitOne(GetNotificationTime() + 5000); // give a little time to fade
+                        if (!delegated)
+                            resp.Error = "Notification bubble did not appear";
+                    }
 
-					if (clicked)
-					{
-						var win = this.host.MainWindow;
-						using (var f = new AccessControlForm())
-						{
-							win.Invoke((MethodInvoker)delegate
-							{
-								f.Icon = win.Icon;
-								f.Plugin = this;
-								f.Entries = needPrompting.ToList();
-								f.Host = submithost != null ? submithost : host;
-								f.Load += delegate { f.Activate(); };
-								f.ShowDialog(win);
-								if (f.Remember && (f.Allowed || f.Denied))
-								{
-									foreach (var e in needPrompting)
-									{
-										var c = GetEntryConfig(e);
-										if (c == null)
-											c = new KeePassHttpEntryConfig();
-										var set = f.Allowed ? c.Allow : c.Deny;
-										set.Add(host);
-										if (submithost != null && submithost != host)
-											set.Add(submithost);
-										SetEntryConfig(e, c);
+                    if (clicked)
+                    {
+                        var win = this.host.MainWindow;
+                        using (var f = new AccessControlForm())
+                        {
+                            win.Invoke((MethodInvoker)delegate
+                            {
+                                f.Icon = win.Icon;
+                                f.Plugin = this;
+                                f.Entries = needPrompting.ToList();
+                                f.Host = submithost != null ? submithost : host;
+                                f.Load += delegate { f.Activate(); };
+                                f.ShowDialog(win);
+                                if (f.Remember && (f.Allowed || f.Denied))
+                                {
+                                    foreach (var e in needPrompting)
+                                    {
+                                        var c = GetEntryConfig(e);
+                                        if (c == null)
+                                            c = new KeePassHttpEntryConfig();
+                                        var set = f.Allowed ? c.Allow : c.Deny;
+                                        set.Add(host);
+                                        if (submithost != null && submithost != host)
+                                            set.Add(submithost);
+                                        SetEntryConfig(e, c);
 
-									}
-								}
-								if (!f.Allowed)
-									items = items.Except(needPrompting);
-							});
-						}
-					}
-					else
-					{
-						items = items.Except(needPrompting);
-					}
-				}
+                                    }
+                                }
+                                if (!f.Allowed)
+                                    items = items.Except(needPrompting);
+                            });
+                        }
+                    }
+                    else
+                    {
+                        items = items.Except(needPrompting);
+                    }
+                }
 
-				if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
-				{
-					string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
-					if (sortHost.EndsWith("/"))
-						sortHost = sortHost.Substring(0, sortHost.Length - 1);
+                if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
+                {
+                    string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
+                    if (sortHost.EndsWith("/"))
+                        sortHost = sortHost.Substring(0, sortHost.Length - 1);
 
-					string sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
-					if (sortSubmiturl == null)
-						sortSubmiturl = String.Copy(sortHost);
-					if (sortSubmiturl.EndsWith("/"))
-						sortSubmiturl = sortSubmiturl.Substring(0, sortSubmiturl.Length - 1);
+                    string sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                    if (sortSubmiturl == null)
+                        sortSubmiturl = String.Copy(sortHost);
+                    if (sortSubmiturl.EndsWith("/"))
+                        sortSubmiturl = sortSubmiturl.Substring(0, sortSubmiturl.Length - 1);
 
-					if (!sortSubmiturl.Contains("://"))
-						sortSubmiturl = "http://" + sortSubmiturl;
-					if (!sortHost.Contains("://"))
-						sortHost = "http://" + sortHost;
+                    if (!sortSubmiturl.Contains("://"))
+                        sortSubmiturl = "http://" + sortSubmiturl;
+                    if (!sortHost.Contains("://"))
+                        sortHost = "http://" + sortHost;
 
-					string sortBaseSubmiturl = String.Copy(sortSubmiturl);
-					if (sortSubmiturl.LastIndexOf("/") > 7)
-					{
-						Uri sortBaseSubmithostURI = new Uri(sortSubmiturl);
-						sortBaseSubmiturl = String.Format("{0}{1}{2}{3}", sortBaseSubmithostURI.Scheme,
-							Uri.SchemeDelimiter, sortBaseSubmithostURI.Authority, sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/")));
-					}
+                    string sortBaseSubmiturl = String.Copy(sortSubmiturl);
+                    if (sortSubmiturl.LastIndexOf("/") > 7)
+                    {
+                        Uri sortBaseSubmithostURI = new Uri(sortSubmiturl);
+                        sortBaseSubmiturl = String.Format("{0}{1}{2}{3}", sortBaseSubmithostURI.Scheme,
+                            Uri.SchemeDelimiter, sortBaseSubmithostURI.Authority, sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/")));
+                    }
 
-					sortSubmiturl = sortSubmiturl.ToLower();
-					sortHost = sortHost.ToLower();
-					sortBaseSubmiturl = sortBaseSubmiturl.ToLower();
+                    sortSubmiturl = sortSubmiturl.ToLower();
+                    sortHost = sortHost.ToLower();
+                    sortBaseSubmiturl = sortBaseSubmiturl.ToLower();
 
-					foreach (var e in items)
-					{
-						string entryUrl = String.Copy(e.Strings.ReadSafe(PwDefs.UrlField));
-						if (entryUrl.EndsWith("/"))
-							entryUrl = entryUrl.Substring(0, entryUrl.Length - 1);
-						entryUrl = entryUrl.ToLower();
-						if (!entryUrl.Contains("://"))
-							entryUrl = "http://" + entryUrl;
+                    foreach (var e in items)
+                    {
+                        string entryUrl = String.Copy(e.Strings.ReadSafe(PwDefs.UrlField));
+                        if (entryUrl.EndsWith("/"))
+                            entryUrl = entryUrl.Substring(0, entryUrl.Length - 1);
+                        entryUrl = entryUrl.ToLower();
+                        if (!entryUrl.Contains("://"))
+                            entryUrl = "http://" + entryUrl;
 
-						string baseEntryUrl = String.Copy(entryUrl);
-						if (baseEntryUrl.LastIndexOf("/") > 7)
-						{
-							Uri baseEntryUrlURI = new Uri(entryUrl);
-							baseEntryUrl = String.Format("{0}{1}{2}{3}", baseEntryUrlURI.Scheme,
-								Uri.SchemeDelimiter, baseEntryUrlURI.Authority, baseEntryUrlURI.AbsolutePath.Substring(0, baseEntryUrlURI.AbsolutePath.LastIndexOf("/")));
-						}
+                        string baseEntryUrl = String.Copy(entryUrl);
+                        if (baseEntryUrl.LastIndexOf("/") > 7)
+                        {
+                            Uri baseEntryUrlURI = new Uri(entryUrl);
+                            baseEntryUrl = String.Format("{0}{1}{2}{3}", baseEntryUrlURI.Scheme,
+                                Uri.SchemeDelimiter, baseEntryUrlURI.Authority, baseEntryUrlURI.AbsolutePath.Substring(0, baseEntryUrlURI.AbsolutePath.LastIndexOf("/")));
+                        }
 
-						if (sortSubmiturl == entryUrl)
-							e.UsageCount = 90;
-						else if (sortSubmiturl.StartsWith(entryUrl) && sortHost != entryUrl && sortBaseSubmiturl != entryUrl)
-							e.UsageCount = 80;
-						else if (sortSubmiturl.StartsWith(baseEntryUrl) && sortHost != baseEntryUrl && sortBaseSubmiturl != baseEntryUrl)
-							e.UsageCount = 70;
-						else if (sortHost == entryUrl)
-							e.UsageCount = 50;
-						else if (sortBaseSubmiturl == entryUrl)
-							e.UsageCount = 40;
-						else if (entryUrl.StartsWith(sortSubmiturl))
-							e.UsageCount = 30;
-						else if (entryUrl.StartsWith(sortBaseSubmiturl) && sortBaseSubmiturl != sortHost)
-							e.UsageCount = 25;
-						else if (sortSubmiturl.StartsWith(entryUrl))
-							e.UsageCount = 20;
-						else if (sortSubmiturl.StartsWith(baseEntryUrl))
-							e.UsageCount = 15;
-						else if (entryUrl.StartsWith(sortHost))
-							e.UsageCount = 10;
-						else if (sortHost.StartsWith(entryUrl))
-							e.UsageCount = 5;
-						else
-							e.UsageCount = 1;
-					}
+                        if (sortSubmiturl == entryUrl)
+                            e.UsageCount = 90;
+                        else if (sortSubmiturl.StartsWith(entryUrl) && sortHost != entryUrl && sortBaseSubmiturl != entryUrl)
+                            e.UsageCount = 80;
+                        else if (sortSubmiturl.StartsWith(baseEntryUrl) && sortHost != baseEntryUrl && sortBaseSubmiturl != baseEntryUrl)
+                            e.UsageCount = 70;
+                        else if (sortHost == entryUrl)
+                            e.UsageCount = 50;
+                        else if (sortBaseSubmiturl == entryUrl)
+                            e.UsageCount = 40;
+                        else if (entryUrl.StartsWith(sortSubmiturl))
+                            e.UsageCount = 30;
+                        else if (entryUrl.StartsWith(sortBaseSubmiturl) && sortBaseSubmiturl != sortHost)
+                            e.UsageCount = 25;
+                        else if (sortSubmiturl.StartsWith(entryUrl))
+                            e.UsageCount = 20;
+                        else if (sortSubmiturl.StartsWith(baseEntryUrl))
+                            e.UsageCount = 15;
+                        else if (entryUrl.StartsWith(sortHost))
+                            e.UsageCount = 10;
+                        else if (sortHost.StartsWith(entryUrl))
+                            e.UsageCount = 5;
+                        else
+                            e.UsageCount = 1;
+                    }
 
-					var items2 = from e in items orderby e.UsageCount descending select e;
-					items = items2;
-				}
+                    var items2 = from e in items orderby e.UsageCount descending select e;
+                    items = items2;
+                }
 
-				if (configOpt.SpecificMatchingOnly)
-				{
-					ulong highestCount = 0;
-					foreach (var entry in items)
-					{
-						if (highestCount == 0)
-						{
-							highestCount = entry.UsageCount;
-						}
+                if (configOpt.SpecificMatchingOnly)
+                {
+                    ulong highestCount = 0;
+                    foreach (var entry in items)
+                    {
+                        if (highestCount == 0)
+                        {
+                            highestCount = entry.UsageCount;
+                        }
 
-						if (entry.UsageCount == highestCount)
-						{
-							var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-							var loginpass = GetUserPass(entry);
-							var login = loginpass[0];
-							var passwd = loginpass[1];
-							var uuid = entry.Uuid.ToHexString();
-							var e = new ResponseEntry(name, login, passwd, uuid);
-							resp.Entries.Add(e);
-						}
-					}
-				}
-				else
-				{
-					foreach (var entry in items)
-					{
-						var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-						var loginpass = GetUserPass(entry);
-						var login = loginpass[0];
-						var passwd = loginpass[1];
-						var uuid = entry.Uuid.ToHexString();
-						var e = new ResponseEntry(name, login, passwd, uuid);
-						resp.Entries.Add(e);
-					}
-				}
+                        if (entry.UsageCount == highestCount)
+                        {
+                            var name = entry.Strings.ReadSafe(PwDefs.TitleField);
+                            var loginpass = GetUserPass(entry);
+                            var login = loginpass[0];
+                            var passwd = loginpass[1];
+                            var uuid = entry.Uuid.ToHexString();
+                            var e = new ResponseEntry(name, login, passwd, uuid);
+                            resp.Entries.Add(e);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var entry in items)
+                    {
+                        var name = entry.Strings.ReadSafe(PwDefs.TitleField);
+                        var loginpass = GetUserPass(entry);
+                        var login = loginpass[0];
+                        var passwd = loginpass[1];
+                        var uuid = entry.Uuid.ToHexString();
+                        var e = new ResponseEntry(name, login, passwd, uuid);
+                        resp.Entries.Add(e);
+                    }
+                }
 
-				if (items.ToList().Count > 0)
-				{
-					var names = (from e in resp.Entries select e.Name).Distinct<string>();
-					var n = String.Join("\n    ", names.ToArray<string>());
+                if (items.ToList().Count > 0)
+                {
+                    var names = (from e in resp.Entries select e.Name).Distinct<string>();
+                    var n = String.Join("\n    ", names.ToArray<string>());
 
-					if (configOpt.ReceiveCredentialNotification)
-						ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
-				}
+                    if (configOpt.ReceiveCredentialNotification)
+                        ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
+                }
 
-				resp.Success = true;
-				resp.Id = r.Id;
-				SetResponseVerifier(resp, aes);
+                resp.Success = true;
+                resp.Id = r.Id;
+                SetResponseVerifier(resp, aes);
 
-				foreach (var entry in resp.Entries)
-				{
-					entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
-					entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
-					entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
-					entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
-				}
+                foreach (var entry in resp.Entries)
+                {
+                    entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+                    entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
+                    entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
+                }
 
-				resp.Count = resp.Entries.Count;
-			}
-			else
-			{
-				resp.Success = true;
-				resp.Id = r.Id;
-				SetResponseVerifier(resp, aes);
-			}
+                resp.Count = resp.Entries.Count;
+            }
+            else
+            {
+                resp.Success = true;
+                resp.Id = r.Id;
+                SetResponseVerifier(resp, aes);
+            }
         }
 
         private void SetLoginHandler(Request r, Response resp, Aes aes)
@@ -423,7 +423,7 @@ namespace KeePassHttp {
             PwUuid uuid = null;
             string username, password, url;
             string realm = null;
-			url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
+            url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
             var formhost = GetHost(url);
             if (r.SubmitUrl != null)
                 submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
@@ -444,50 +444,50 @@ namespace KeePassHttp {
                 string[] up = GetUserPass(entry);
                 var u = up[0];
                 var p = up[1];
-				var configOpt = new ConfigOpt(this.host.CustomConfig);
+                var configOpt = new ConfigOpt(this.host.CustomConfig);
 
                 if (u != username || p != password)
-				{
-					bool allowUpdate = configOpt.AlwaysAllowUpdates;
+                {
+                    bool allowUpdate = configOpt.AlwaysAllowUpdates;
 
-					if (!allowUpdate)
-					{
-						if (isBalloonTipsEnabled())
-						{
-							ShowNotification(String.Format(
-								"{0}:  You have an entry change prompt waiting, click to activate", r.Id),
-								(s, e) => host.MainWindow.Activate());
-						}
+                    if (!allowUpdate)
+                    {
+                        if (isBalloonTipsEnabled())
+                        {
+                            ShowNotification(String.Format(
+                                "{0}:  You have an entry change prompt waiting, click to activate", r.Id),
+                                (s, e) => host.MainWindow.Activate());
+                        }
 
-						DialogResult result;
-						if (host.MainWindow.IsTrayed())
-						{
-							result = MessageBox.Show(
-								String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
-								"Update Entry", MessageBoxButtons.YesNo,
-								MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-						}
-						else
-						{
-							result = MessageBox.Show(
-								host.MainWindow,
-								String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
-								"Update Entry", MessageBoxButtons.YesNo,
-								MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-						}
-						
+                        DialogResult result;
+                        if (host.MainWindow.IsTrayed())
+                        {
+                            result = MessageBox.Show(
+                                String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
+                                "Update Entry", MessageBoxButtons.YesNo,
+                                MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                        }
+                        else
+                        {
+                            result = MessageBox.Show(
+                                host.MainWindow,
+                                String.Format("Do you want to update the information in {0} - {1}?", formhost, u),
+                                "Update Entry", MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                        }
+                        
 
-						if (result == DialogResult.Yes)
-						{
-							allowUpdate = true;
-						}
-					}
+                        if (result == DialogResult.Yes)
+                        {
+                            allowUpdate = true;
+                        }
+                    }
 
                     if (allowUpdate)
-					{
-						PwObjectList<PwEntry> m_vHistory = entry.History.CloneDeep();
-						entry.History = m_vHistory;
-						entry.CreateBackup(null);
+                    {
+                        PwObjectList<PwEntry> m_vHistory = entry.History.CloneDeep();
+                        entry.History = m_vHistory;
+                        entry.CreateBackup(null);
 
                         entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                         entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
@@ -498,7 +498,7 @@ namespace KeePassHttp {
             }
             else
             {
-				// creating new entry
+                // creating new entry
                 var root = host.Database.RootGroup;
                 var group = root.FindCreateGroup(KEEPASSHTTP_GROUP_NAME, false);
                 if (group == null)
@@ -510,9 +510,9 @@ namespace KeePassHttp {
 
                 PwEntry entry = new PwEntry(true, true);
                 entry.Strings.Set(PwDefs.TitleField, new ProtectedString(false, formhost));
-				entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
-				entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
-				entry.Strings.Set(PwDefs.UrlField, new ProtectedString(true, url));
+                entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
+                entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
+                entry.Strings.Set(PwDefs.UrlField, new ProtectedString(true, url));
                 
                 if ((submithost != null && formhost != submithost) || realm != null)
                 {
@@ -565,15 +565,15 @@ namespace KeePassHttp {
             }
         }
 
-		private void TestAssociateHandler(Request r, Response resp, Aes aes)
-		{
-			if (!VerifyRequest(r, aes))
-				return;
+        private void TestAssociateHandler(Request r, Response resp, Aes aes)
+        {
+            if (!VerifyRequest(r, aes))
+                return;
 
-			resp.Success = true;
-			resp.Id = r.Id;
-			SetResponseVerifier(resp, aes);
-		}
+            resp.Success = true;
+            resp.Id = r.Id;
+            SetResponseVerifier(resp, aes);
+        }
 
         private KeePassHttpEntryConfig GetEntryConfig(PwEntry e)
         {

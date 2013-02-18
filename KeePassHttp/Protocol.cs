@@ -63,15 +63,15 @@ namespace KeePassHttp
         public const string GET_LOGINS_COUNT = "get-logins-count";
         public const string GET_ALL_LOGINS = "get-all-logins";
         public const string SET_LOGIN = "set-login";
-		public const string ASSOCIATE = "associate";
-		public const string TEST_ASSOCIATE = "test-associate";
+        public const string ASSOCIATE = "associate";
+        public const string TEST_ASSOCIATE = "test-associate";
 
-		public string RequestType;
+        public string RequestType;
 
-		/// <summary>
-		/// Sort selection by best URL matching for given hosts
-		/// </summary>
-		public string SortSelection;
+        /// <summary>
+        /// Sort selection by best URL matching for given hosts
+        /// </summary>
+        public string SortSelection;
 
         /// <summary>
         /// Always encrypted, used with set-login, uuid is set
@@ -128,19 +128,19 @@ namespace KeePassHttp
             else
                 Entries = null;
 
-			Assembly assembly = Assembly.GetExecutingAssembly();
-			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-			this.Version = fvi.ProductVersion;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            this.Version = fvi.ProductVersion;
 
-			this.Hash = hash;
+            this.Hash = hash;
         }
 
         /// <summary>
         /// Mirrors the request type of KeePassRequest
         /// </summary>
-		public string RequestType;
+        public string RequestType;
 
-		public string Error = null;
+        public string Error = null;
 
         public bool Success = false;
 
@@ -148,22 +148,22 @@ namespace KeePassHttp
         /// The user selected string as a result of 'associate',
         /// always returned on every request
         /// </summary>
-		public string Id;
+        public string Id;
 
-		/// <summary>
-		/// response to get-logins-count, number of entries for requested Url
-		/// </summary>
-		public int Count = 0;
+        /// <summary>
+        /// response to get-logins-count, number of entries for requested Url
+        /// </summary>
+        public int Count = 0;
 
-		/// <summary>
-		/// response the current version of KeePassHttp
-		/// </summary>
-		public string Version = "";
+        /// <summary>
+        /// response the current version of KeePassHttp
+        /// </summary>
+        public string Version = "";
 
-		/// <summary>
-		/// response an unique hash of the database composed of RootGroup UUid and RecycleBin UUid
-		/// </summary>
-		public string Hash = "";
+        /// <summary>
+        /// response an unique hash of the database composed of RootGroup UUid and RecycleBin UUid
+        /// </summary>
+        public string Hash = "";
 
         /// <summary>
         /// The resulting entries for a get-login request
