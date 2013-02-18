@@ -1,24 +1,5 @@
 KeePassHttp plugin for KeePass
-
-New features:
-	- Setting: return only specific matching instead of all domain name matchings
-	- Setting: Always allow access to entries
-	- Setting: Always allow updating entries
-	- returns entries sorted by matching url (used in ChromeIPass)
-
-You can change the settings of KeePassHttp in Keepass:
-	Choose Menu: Tools > KeePassHttp Options...
-	
-For Chrome users I recommend the use of my improved version of ChromeIPass which you can find here:
-	https://github.com/lspcity/passifox
-
-
-
-=========================================================================
-Original README
-=========================================================================
-
-KeePassHttp plugin for KeePass
+=======
 
 Provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
@@ -38,6 +19,19 @@ Mono and KeePass Portable users:
         $ apt-get install mono-complete
     * Mono on Mac seems to fully support KeePassHttp; it does not work for me
 
+New features:
+	- setting: return only specific matching instead of all domain name matchings
+	- setting: Always allow access to entries
+	- setting: Always allow updating entries
+	- setting: Search in all opened databases
+	- returns entries sorted by matching url
+	- error messages with hints for solution
+	
+You can change the settings of KeePassHttp in Keepass:
+	Choose Menu: Tools > KeePassHttp Options...
+
+=======================
+	
 Prereqs:
     1) KeePass
     2) Newtonsoft.Json (bundled 3.5r8)
