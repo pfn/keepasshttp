@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.credSearchInAllOpenedDatabases = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.credAllowUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.credAllowAccessCheckbox = new System.Windows.Forms.CheckBox();
@@ -36,7 +37,7 @@
             this.credNotifyCheckbox = new System.Windows.Forms.CheckBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.okButton = new System.Windows.Forms.Button();
-            this.credSearchInAllOpenedDatabases = new System.Windows.Forms.CheckBox();
+            this.removeButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,6 +46,7 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.removeButton);
             this.groupBox1.Controls.Add(this.credSearchInAllOpenedDatabases);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.credAllowUpdatesCheckbox);
@@ -53,10 +55,20 @@
             this.groupBox1.Controls.Add(this.credNotifyCheckbox);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(361, 190);
+            this.groupBox1.Size = new System.Drawing.Size(361, 244);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Preferences";
+            // 
+            // credSearchInAllOpenedDatabases
+            // 
+            this.credSearchInAllOpenedDatabases.AutoSize = true;
+            this.credSearchInAllOpenedDatabases.Location = new System.Drawing.Point(8, 168);
+            this.credSearchInAllOpenedDatabases.Name = "credSearchInAllOpenedDatabases";
+            this.credSearchInAllOpenedDatabases.Size = new System.Drawing.Size(270, 17);
+            this.credSearchInAllOpenedDatabases.TabIndex = 5;
+            this.credSearchInAllOpenedDatabases.Text = "Search in all &opened databases for matching entries";
+            this.credSearchInAllOpenedDatabases.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -114,7 +126,7 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(285, 210);
+            this.cancelButton.Location = new System.Drawing.Point(285, 264);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(88, 28);
             this.cancelButton.TabIndex = 2;
@@ -126,7 +138,7 @@
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.okButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.okButton.Location = new System.Drawing.Point(189, 210);
+            this.okButton.Location = new System.Drawing.Point(189, 264);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(88, 28);
             this.okButton.TabIndex = 1;
@@ -134,15 +146,15 @@
             this.okButton.UseVisualStyleBackColor = true;
             this.okButton.Click += new System.EventHandler(this.okButton_Click);
             // 
-            // credSearchInAllOpenedDatabases
+            // removeButton
             // 
-            this.credSearchInAllOpenedDatabases.AutoSize = true;
-            this.credSearchInAllOpenedDatabases.Location = new System.Drawing.Point(8, 168);
-            this.credSearchInAllOpenedDatabases.Name = "credSearchInAllOpenedDatabases";
-            this.credSearchInAllOpenedDatabases.Size = new System.Drawing.Size(270, 17);
-            this.credSearchInAllOpenedDatabases.TabIndex = 5;
-            this.credSearchInAllOpenedDatabases.Text = "Search in all &opened databases for matching entries";
-            this.credSearchInAllOpenedDatabases.UseVisualStyleBackColor = true;
+            this.removeButton.Location = new System.Drawing.Point(8, 207);
+            this.removeButton.Name = "removeButton";
+            this.removeButton.Size = new System.Drawing.Size(345, 28);
+            this.removeButton.TabIndex = 3;
+            this.removeButton.Text = "&Remove all existing connections from active database";
+            this.removeButton.UseVisualStyleBackColor = true;
+            this.removeButton.Click += new System.EventHandler(this.removeButton_Click);
             // 
             // OptionsForm
             // 
@@ -150,7 +162,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(383, 247);
+            this.ClientSize = new System.Drawing.Size(383, 301);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
@@ -178,5 +190,6 @@
         private System.Windows.Forms.CheckBox credAllowUpdatesCheckbox;
         private System.Windows.Forms.CheckBox credAllowAccessCheckbox;
         private System.Windows.Forms.CheckBox credSearchInAllOpenedDatabases;
+        private System.Windows.Forms.Button removeButton;
     }
 }

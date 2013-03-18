@@ -29,7 +29,7 @@ namespace KeePassHttp
         /// <summary>
         /// an arbitrarily generated uuid for the keepasshttp root entry
         /// </summary>
-        private readonly byte[] KEEPASSHTTP_UUID = {
+        public readonly byte[] KEEPASSHTTP_UUID = {
                 0x34, 0x69, 0x7a, 0x40, 0x8a, 0x5b, 0x41, 0xc0,
                 0x9f, 0x36, 0x89, 0x7d, 0x62, 0x3e, 0xcb, 0x31
                                                 };
@@ -37,7 +37,7 @@ namespace KeePassHttp
         private const int DEFAULT_NOTIFICATION_TIME = 5000;
         private const string KEEPASSHTTP_NAME = "KeePassHttp Settings";
         private const string KEEPASSHTTP_GROUP_NAME = "KeePassHttp Passwords";
-        private const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
+        public const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
         private IPluginHost host;
         private HttpListener listener;
         private const int DEFAULT_PORT = 19455;

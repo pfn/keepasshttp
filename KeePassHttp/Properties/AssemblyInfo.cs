@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Perry Nguyen, Lukas Schulze")]
 [assembly: AssemblyProduct("KeePass Plugin")]
-[assembly: AssemblyCopyright("Copyright © Perry Nguyen 2012")]
+[assembly: AssemblyCopyright("Copyright © Perry Nguyen, Lukas Schulze 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.21.0.0")]
-[assembly: AssemblyFileVersion("1.1.2.0")]
+[assembly: AssemblyFileVersion("1.1.3.0")]
