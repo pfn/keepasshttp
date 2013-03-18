@@ -85,6 +85,7 @@ namespace KeePassHttp
             return base64out ? encode64(buf) : Encoding.UTF8.GetString(buf);
             }
         }
+
         private PwEntry GetConfigEntry(bool create)
         {
             var root = host.Database.RootGroup;
@@ -100,6 +101,7 @@ namespace KeePassHttp
             }
             return entry;
         }
+
         private int GetNotificationTime()
         {
             var time = DEFAULT_NOTIFICATION_TIME;
@@ -119,14 +121,17 @@ namespace KeePassHttp
 
             return time;
         }
+
         private void ShowNotification(string text)
         {
             ShowNotification(text, null, null);
         }
+
         private void ShowNotification(string text, EventHandler onclick)
         {
             ShowNotification(text, onclick, null);
         }
+
         private void ShowNotification(string text, EventHandler onclick, EventHandler onclose)
         {
             MethodInvoker m = delegate
@@ -365,13 +370,18 @@ namespace KeePassHttp
 
         internal string[] GetUserPass(PwEntry entry)
         {
+            return GetUserPass(new PwEntryDatabase(entry, host.Database));
+        }
+
+        internal string[] GetUserPass(PwEntryDatabase entryDatabase)
+        {
             // follow references
-            SprContext ctx = new SprContext(entry, host.Database,
+            SprContext ctx = new SprContext(entryDatabase.entry, entryDatabase.database,
                     SprCompileFlags.All, false, false);
             string user = SprEngine.Compile(
-                    entry.Strings.ReadSafe(PwDefs.UserNameField), ctx);
+                    entryDatabase.entry.Strings.ReadSafe(PwDefs.UserNameField), ctx);
             string pass = SprEngine.Compile(
-                    entry.Strings.ReadSafe(PwDefs.PasswordField), ctx);
+                    entryDatabase.entry.Strings.ReadSafe(PwDefs.PasswordField), ctx);
             var f = (MethodInvoker)delegate
             {
                 // apparently, SprEngine.Compile might modify the database

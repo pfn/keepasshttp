@@ -72,6 +72,7 @@
     </Compile>
     <Compile Include="KeePassHttp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PwEntryDatabase.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

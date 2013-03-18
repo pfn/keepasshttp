@@ -90,11 +90,11 @@ namespace KeePassHttp {
             }
         }
 
-        private IEnumerable<PwEntry> FindMatchingEntries(Request r, Aes aes)
+        private IEnumerable<PwEntryDatabase> FindMatchingEntries(Request r, Aes aes)
         {
             string submithost = null;
             string realm = null;
-            var list = new PwObjectList<PwEntry>();
+            var listResult = new List<PwEntryDatabase>();
             string formhost, searchHost;
             formhost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
             if (r.SubmitUrl != null) {
@@ -106,7 +106,7 @@ namespace KeePassHttp {
             var origSearchHost = searchHost;
             var parms = MakeSearchParameters();
 
-            PwObjectList<PwGroup> listDatabases = new PwObjectList<PwGroup>();
+            List<PwDatabase> listDatabases = new List<PwDatabase>();
 
             var configOpt = new ConfigOpt(this.host.CustomConfig);
             if (configOpt.SearchInAllOpenedDatabases)
@@ -115,30 +115,35 @@ namespace KeePassHttp {
                 {
                     if (doc.Database.IsOpen)
                     {
-                        listDatabases.Add(doc.Database.RootGroup);
+                        listDatabases.Add(doc.Database);
                     }
                 }
             }
             else
             {
-                listDatabases.Add(host.Database.RootGroup);
+                listDatabases.Add(host.Database);
             }
 
-            uint listCount = 0;
-            foreach (PwGroup group in listDatabases)
+            int listCount = 0;
+            foreach (PwDatabase db in listDatabases)
             {
                 searchHost = origSearchHost;
                 //get all possible entries for given host-name
-                while (list.UCount == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
+                while (listResult.Count == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
                 {
                     parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
-                    group.SearchEntries(parms, list);
+                    var listEntries = new PwObjectList<PwEntry>();
+                    db.RootGroup.SearchEntries(parms, listEntries);
+                    foreach (var le in listEntries)
+                    {
+                        listResult.Add(new PwEntryDatabase(le, db));
+                    }
                     searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
                     //searchHost contains no dot --> prevent possible infinite loop
                     if (searchHost == origSearchHost)
                         break;
                 }
-                listCount = list.UCount;
+                listCount = listResult.Count;
             }
             
 
@@ -172,7 +177,7 @@ namespace KeePassHttp {
                 return formhost.Contains(title) || (entryUrl != null && formhost.Contains(entryUrl));
             };
 
-            return from e in list where filter(e) select e;
+            return from e in listResult where filter(e.entry) select e;
         }
 
         private void GetLoginsCountHandler(Request r, Response resp, Aes aes)
@@ -218,7 +223,7 @@ namespace KeePassHttp {
                 var autoAllowS = config.Strings.ReadSafe("Auto Allow");
                 var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
                 autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
-                var needPrompting = from e in items where filter(e) select e;
+                var needPrompting = from e in items where filter(e.entry) select e;
 
                 if (needPrompting.ToList().Count > 0 && !autoAllow)
                 {
@@ -250,7 +255,8 @@ namespace KeePassHttp {
                             {
                                 f.Icon = win.Icon;
                                 f.Plugin = this;
-                                f.Entries = needPrompting.ToList();
+                                f.Entries = (from e in items where filter(e.entry) select e.entry).ToList();
+                                //f.Entries = needPrompting.ToList();
                                 f.Host = submithost != null ? submithost : host;
                                 f.Load += delegate { f.Activate(); };
                                 f.ShowDialog(win);
@@ -258,19 +264,21 @@ namespace KeePassHttp {
                                 {
                                     foreach (var e in needPrompting)
                                     {
-                                        var c = GetEntryConfig(e);
+                                        var c = GetEntryConfig(e.entry);
                                         if (c == null)
                                             c = new KeePassHttpEntryConfig();
                                         var set = f.Allowed ? c.Allow : c.Deny;
                                         set.Add(host);
                                         if (submithost != null && submithost != host)
                                             set.Add(submithost);
-                                        SetEntryConfig(e, c);
+                                        SetEntryConfig(e.entry, c);
 
                                     }
                                 }
                                 if (!f.Allowed)
+                                {
                                     items = items.Except(needPrompting);
+                                }
                             });
                         }
                     }
@@ -309,9 +317,9 @@ namespace KeePassHttp {
                     sortHost = sortHost.ToLower();
                     sortBaseSubmiturl = sortBaseSubmiturl.ToLower();
 
-                    foreach (var e in items)
+                    foreach (var entryDatabase in items)
                     {
-                        string entryUrl = String.Copy(e.Strings.ReadSafe(PwDefs.UrlField));
+                        string entryUrl = String.Copy(entryDatabase.entry.Strings.ReadSafe(PwDefs.UrlField));
                         if (entryUrl.EndsWith("/"))
                             entryUrl = entryUrl.Substring(0, entryUrl.Length - 1);
                         entryUrl = entryUrl.ToLower();
@@ -327,52 +335,52 @@ namespace KeePassHttp {
                         }
 
                         if (sortSubmiturl == entryUrl)
-                            e.UsageCount = 90;
+                            entryDatabase.entry.UsageCount = 90;
                         else if (sortSubmiturl.StartsWith(entryUrl) && sortHost != entryUrl && sortBaseSubmiturl != entryUrl)
-                            e.UsageCount = 80;
+                            entryDatabase.entry.UsageCount = 80;
                         else if (sortSubmiturl.StartsWith(baseEntryUrl) && sortHost != baseEntryUrl && sortBaseSubmiturl != baseEntryUrl)
-                            e.UsageCount = 70;
+                            entryDatabase.entry.UsageCount = 70;
                         else if (sortHost == entryUrl)
-                            e.UsageCount = 50;
+                            entryDatabase.entry.UsageCount = 50;
                         else if (sortBaseSubmiturl == entryUrl)
-                            e.UsageCount = 40;
+                            entryDatabase.entry.UsageCount = 40;
                         else if (entryUrl.StartsWith(sortSubmiturl))
-                            e.UsageCount = 30;
+                            entryDatabase.entry.UsageCount = 30;
                         else if (entryUrl.StartsWith(sortBaseSubmiturl) && sortBaseSubmiturl != sortHost)
-                            e.UsageCount = 25;
+                            entryDatabase.entry.UsageCount = 25;
                         else if (sortSubmiturl.StartsWith(entryUrl))
-                            e.UsageCount = 20;
+                            entryDatabase.entry.UsageCount = 20;
                         else if (sortSubmiturl.StartsWith(baseEntryUrl))
-                            e.UsageCount = 15;
+                            entryDatabase.entry.UsageCount = 15;
                         else if (entryUrl.StartsWith(sortHost))
-                            e.UsageCount = 10;
+                            entryDatabase.entry.UsageCount = 10;
                         else if (sortHost.StartsWith(entryUrl))
-                            e.UsageCount = 5;
+                            entryDatabase.entry.UsageCount = 5;
                         else
-                            e.UsageCount = 1;
+                            entryDatabase.entry.UsageCount = 1;
                     }
 
-                    var items2 = from e in items orderby e.UsageCount descending select e;
+                    var items2 = from e in items orderby e.entry.UsageCount descending select e;
                     items = items2;
                 }
 
                 if (configOpt.SpecificMatchingOnly)
                 {
                     ulong highestCount = 0;
-                    foreach (var entry in items)
+                    foreach (var entryDatabase in items)
                     {
                         if (highestCount == 0)
                         {
-                            highestCount = entry.UsageCount;
+                            highestCount = entryDatabase.entry.UsageCount;
                         }
 
-                        if (entry.UsageCount == highestCount)
+                        if (entryDatabase.entry.UsageCount == highestCount)
                         {
-                            var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-                            var loginpass = GetUserPass(entry);
+                            var name = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
+                            var loginpass = GetUserPass(entryDatabase);
                             var login = loginpass[0];
                             var passwd = loginpass[1];
-                            var uuid = entry.Uuid.ToHexString();
+                            var uuid = entryDatabase.entry.Uuid.ToHexString();
                             var e = new ResponseEntry(name, login, passwd, uuid);
                             resp.Entries.Add(e);
                         }
@@ -380,13 +388,13 @@ namespace KeePassHttp {
                 }
                 else
                 {
-                    foreach (var entry in items)
+                    foreach (var entryDatabase in items)
                     {
-                        var name = entry.Strings.ReadSafe(PwDefs.TitleField);
-                        var loginpass = GetUserPass(entry);
+                        var name = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
+                        var loginpass = GetUserPass(entryDatabase);
                         var login = loginpass[0];
                         var passwd = loginpass[1];
-                        var uuid = entry.Uuid.ToHexString();
+                        var uuid = entryDatabase.entry.Uuid.ToHexString();
                         var e = new ResponseEntry(name, login, passwd, uuid);
                         resp.Entries.Add(e);
                     }

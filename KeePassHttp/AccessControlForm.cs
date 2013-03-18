@@ -72,12 +72,18 @@ namespace KeePassHttp
         {
             if (_Host == null)
                 return;
-            ConfirmTextLabel.Text = String.Format(Message, _Host, Count == 1 ? "item" : "items");
+            ConfirmTextLabel.Text = String.Format(
+                Message,
+                _Host,
+                Count == 1 ? "item" : "items",
+                Count == 1 ? "" : "\nYou can only grant access to all items.",
+                Count == 1 ? "" : " to all of them"
+            );
         }
 
         private int Count = 0;
-        private const string Message = "{0} has requested access to passwords for the above {1}. " +
-            "Please select whether you want to allow access.";
+        private const string Message = "{0} has requested access to passwords for the above {1}.{2} " +
+            "Please select whether you want to allow access{3}.";
         private string _Host = null;
         internal KeePassHttpExt Plugin = null;
     }
