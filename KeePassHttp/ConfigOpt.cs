@@ -7,6 +7,7 @@ namespace KeePassHttp
         readonly AceCustomConfig _config;
         const string ReceiveCredentialNotificationKey = "KeePassHttp_ReceiveCredentialNotification";
         const string SpecificMatchingOnlyKey = "KeePassHttp_SpecificMatchingOnly";
+        const string UnlockDatabaseRequestKey = "KeePassHttp_UnlockDatabaseRequest";
         const string AlwaysAllowAccessKey = "KeePassHttp_AlwaysAllowAccess";
         const string AlwaysAllowUpdatesKey = "KeePassHttp_AlwaysAllowUpdates";
         const string SearchInAllOpenedDatabasesKey = "KeePassHttp_SearchInAllOpenedDatabases";
@@ -20,6 +21,12 @@ namespace KeePassHttp
         {
             get { return _config.GetBool(ReceiveCredentialNotificationKey, true); }
             set { _config.SetBool(ReceiveCredentialNotificationKey, value); }
+        }
+
+        public bool UnlockDatabaseRequest
+        {
+            get { return _config.GetBool(UnlockDatabaseRequestKey, true); }
+            set { _config.SetBool(UnlockDatabaseRequestKey, value); }
         }
 
         public bool SpecificMatchingOnly

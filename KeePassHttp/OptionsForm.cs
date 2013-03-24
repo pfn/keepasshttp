@@ -36,6 +36,7 @@ namespace KeePassHttp
         {
             credNotifyCheckbox.Checked = _config.ReceiveCredentialNotification;
             credMatchingCheckbox.Checked = _config.SpecificMatchingOnly;
+            unlockDatabaseCheckbox.Checked = _config.UnlockDatabaseRequest;
             credAllowAccessCheckbox.Checked = _config.AlwaysAllowAccess;
             credAllowUpdatesCheckbox.Checked = _config.AlwaysAllowUpdates;
             credSearchInAllOpenedDatabases.Checked = _config.SearchInAllOpenedDatabases;
@@ -45,6 +46,7 @@ namespace KeePassHttp
         {
             _config.ReceiveCredentialNotification = credNotifyCheckbox.Checked;
             _config.SpecificMatchingOnly = credMatchingCheckbox.Checked;
+            _config.UnlockDatabaseRequest = unlockDatabaseCheckbox.Checked;
             _config.AlwaysAllowAccess = credAllowAccessCheckbox.Checked;
             _config.AlwaysAllowUpdates = credAllowUpdatesCheckbox.Checked;
             _config.SearchInAllOpenedDatabases = credSearchInAllOpenedDatabases.Checked;
@@ -83,7 +85,8 @@ namespace KeePassHttp
                         entry.Touch(true);
                         KeePass.Program.MainForm.UpdateUI(false, null, true, db.RootGroup, true, null, true);
                         MessageBox.Show(
-                            "Successfully removed " + deleteKeys.Count.ToString() + " connection(s) from KeePassHttp Settings.", "Removed " + deleteKeys.Count.ToString() + " from database",
+                            String.Format("Successfully removed {0} connection{1} from KeePassHttp Settings.", deleteKeys.Count.ToString(), deleteKeys.Count == 1 ? "" : "s"),
+                            "Removed " + deleteKeys.Count.ToString() + " from database",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information
                         );

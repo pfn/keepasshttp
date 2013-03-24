@@ -17,6 +17,7 @@ using KeePassLib.Security;
 
 using Newtonsoft.Json;
 using KeePass.Util.Spr;
+using KeePassLib.Serialization;
 
 namespace KeePassHttp
 {
@@ -303,6 +304,25 @@ namespace KeePassHttp
             var resp = ctx.Response;
 
             var db = host.Database;
+
+            var configOpt = new ConfigOpt(this.host.CustomConfig);
+
+            if (configOpt.UnlockDatabaseRequest && !db.IsOpen)
+            {
+                host.MainWindow.Invoke((MethodInvoker)delegate
+                {
+                    host.MainWindow.EnsureVisibleForegroundWindow(true, true);
+                });
+
+                if (!db.IsOpen)
+                {
+                    host.MainWindow.Invoke((MethodInvoker)delegate
+                    {
+                        host.MainWindow.OpenDatabase(host.MainWindow.DocumentManager.ActiveDocument.LockedIoc, null, false);
+                    });
+                }
+            }
+
             if (db.IsOpen)
             {
                 var serializer = NewJsonSerializer();
