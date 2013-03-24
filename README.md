@@ -54,7 +54,8 @@ The options dialog will appear:
 5. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
 6. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
-7. Removes all stored connection-keys. Every inquirer has to reauthenticate.
+7. Removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
+8. Removes all stored permissions in the entries of the currently selected database.
 
 ## Troubleshooting
 

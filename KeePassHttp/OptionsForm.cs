@@ -102,7 +102,72 @@ namespace KeePassHttp
                 }
                 else
                 {
-                    MessageBox.Show("The active database does not contain an entry of KeePassHttp Settings.", "KeePassHttp Settings not available!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("The active database does not contain an entry of KeePassHttp Settings.", "KeePassHttp Settings not available!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("The active database is locked!\nPlease unlock the selected database or choose another one which is unlocked.", "Database locked!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void removePermissionsButton_Click(object sender, EventArgs e)
+        {
+            if (KeePass.Program.MainForm.DocumentManager.ActiveDatabase.IsOpen)
+            {
+                PwDatabase db = KeePass.Program.MainForm.DocumentManager.ActiveDatabase;
+
+                uint counter = 0;
+                var entries = db.RootGroup.GetEntries(true);
+
+                if (entries.Count() > 999)
+                {
+                    MessageBox.Show(
+                        String.Format("{0} entries detected!\nSearching and removing permissions could take some while.\n\nWe will inform you when the process has been finished.", entries.Count().ToString()),
+                        String.Format("{0} entries detected", entries.Count().ToString()),
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+
+                foreach (var entry in entries) {
+                    foreach (var str in entry.Strings)
+                    {
+                        if (str.Key == KeePassHttpExt.KEEPASSHTTP_NAME)
+                        {
+                            PwObjectList<PwEntry> m_vHistory = entry.History.CloneDeep();
+                            entry.History = m_vHistory;
+                            entry.CreateBackup(null);
+
+                            entry.Strings.Remove(str.Key);
+
+                            entry.Touch(true);
+
+                            counter += 1;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (counter > 0)
+                {
+                    KeePass.Program.MainForm.UpdateUI(false, null, true, db.RootGroup, true, null, true);
+                    MessageBox.Show(
+                        String.Format("Successfully removed permissions from {0} entr{1}.", counter.ToString(), counter == 1 ? "y" : "ies"),
+                        String.Format("Removed permissions from {0} entr{1}", counter.ToString(), counter == 1 ? "y" : "ies"),
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "The active database does not contain an entry with permissions.",
+                        "No entry with permissions found!",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
                 }
             }
             else
