@@ -81,7 +81,7 @@ If a new client has to connect to KeePassHttp, the encryption key is generated a
 
 If you want to develop new features or improve existing ones here is a way to build it at your own:
 
-1. copy the Newtonsoft.Json.dll into the sourcecode folder (bundled 3.5r8)
+1. copy the file [Newtonsoft.Json.dll](http://json.codeplex.com/releases/) into the sourcecode folder
 2. delete the directory "bin" from sourcecode
 3. delete the directory "obj" from sourcecode
 4. delete the file "KeePassHttp.dll"
