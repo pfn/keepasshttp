@@ -68,6 +68,40 @@ If you are having problems with KeePassHttp, please tell us which versions of
 * clients
 
 you are using.
+
+## URL matching: How does it work?
+
+KeePassHttp can receive 2 different URLs, called URL and SubmitURL.
+
+1. The host of the URL is extracted (http://www.example.org --> www.example.org)
+2. All entries in the database are searched for this host:
+  - searched fields: title + URL
+  - matching result will be: at least of the searched fields contain the host ("http://www.example.org/index.html" contains "www.example.org")
+  - if no entry was found, the host is cropped from beginning to the next point and the search restarts (www.example.org --> example.org --> org).
+3. Now all found entries are filtered for one of the following points:
+  - title-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
+  - URL-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
+  - host of (1) contains the whole content of the title-field or the URL-field
+4. If the request passed the flag _SortSelection_ the filtered entries are sorted by best matching URL:
+  - entryURL from URL-field of an entry is prepared
+    - ending slash will be removed
+    - missing scheme in front of entryURL will add "http://" to the beginning of entryURL
+  - baseSubmitURL is the submitURL without ending filename and arguments (http://www.example.org/index.php?arg=1 --> http://www.example.org)
+  - baseEntryURL is the entryURL without ending filename and arguments
+  - sort order by highest matching:
+    - submitURL == entryURL
+    - submitURL starts with entryURL and entryURL != host (1) and baseSubmitURL != entryURL
+    - submitURL starts with baseEntryURL and entryURL != host (1) and baseSubmitURL != baseEntryURL
+    - entryURL == host (1)
+    - entryURL == baseSubmitURL
+    - entryURL starts with submitURL
+    - entryURL starts with baseSubmitURL and baseSubmitURL != host (1)
+    - submitURL starts with entryURL
+    - submitURL starts with baseEntryURL
+    - entryURL starts with host (1)
+    - host (1) starts with entryURL
+	- otherwise last position in list
+5. If the setting for best matching entries is activated only the entries with the highest matching of step 4 will be returned.
  
 ## Security
 
