@@ -85,8 +85,8 @@ namespace KeePassHttp
                         entry.Touch(true);
                         KeePass.Program.MainForm.UpdateUI(false, null, true, db.RootGroup, true, null, true);
                         MessageBox.Show(
-                            String.Format("Successfully removed {0} connection{1} from KeePassHttp Settings.", deleteKeys.Count.ToString(), deleteKeys.Count == 1 ? "" : "s"),
-                            "Removed " + deleteKeys.Count.ToString() + " from database",
+                            String.Format("Successfully removed {0} encryption-key{1} from KeePassHttp Settings.", deleteKeys.Count.ToString(), deleteKeys.Count == 1 ? "" : "s"),
+                            String.Format("Removed {0} key{1} from database", deleteKeys.Count.ToString(), deleteKeys.Count == 1 ? "" : "s"),
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information
                         );
@@ -94,7 +94,7 @@ namespace KeePassHttp
                     else
                     {
                         MessageBox.Show(
-                            "No existing connections found in KeePassHttp Settings.", "No existing connections found",
+                            "No shared encryption-keys found in KeePassHttp Settings.", "No keys found",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information
                         );

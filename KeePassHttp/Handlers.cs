@@ -92,13 +92,13 @@ namespace KeePassHttp {
 
         private IEnumerable<PwEntryDatabase> FindMatchingEntries(Request r, Aes aes)
         {
-            string submithost = null;
+            string submitHost = null;
             string realm = null;
             var listResult = new List<PwEntryDatabase>();
-            string formhost, searchHost;
-            formhost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
+            string formHost, searchHost;
+            formHost = searchHost = GetHost(CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT));
             if (r.SubmitUrl != null) {
-                submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+                submitHost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
             }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
@@ -139,6 +139,7 @@ namespace KeePassHttp {
                         listResult.Add(new PwEntryDatabase(le, db));
                     }
                     searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
+                    
                     //searchHost contains no dot --> prevent possible infinite loop
                     if (searchHost == origSearchHost)
                         break;
@@ -154,27 +155,27 @@ namespace KeePassHttp {
                 var c = GetEntryConfig(e);
                 if (c != null)
                 {
-                    if (c.Allow.Contains(formhost) && (submithost == null || c.Allow.Contains(submithost)))
+                    if (c.Allow.Contains(formHost) && (submitHost == null || c.Allow.Contains(submitHost)))
                         return true;
-                    if (c.Deny.Contains(formhost) || (submithost != null && c.Deny.Contains(submithost)))
+                    if (c.Deny.Contains(formHost) || (submitHost != null && c.Deny.Contains(submitHost)))
                         return false;
                     if (realm != null && c.Realm != realm)
                         return false;
                 }
 
-                if (title.StartsWith("http://") || title.StartsWith("https://"))
+                if (title.StartsWith("http://") || title.StartsWith("https://") || title.StartsWith("ftp://") || title.StartsWith("sftp://"))
                 {
                     var u = new Uri(title);
-                    if (formhost.Contains(u.Host))
+                    if (formHost.Contains(u.Host))
                         return true;
                 }
-                if (entryUrl != null && entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://"))
+                if (entryUrl != null && (entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://") || title.StartsWith("ftp://") || title.StartsWith("sftp://")))
                 {
                     var u = new Uri(entryUrl);
-                    if (formhost.Contains(u.Host))
+                    if (formHost.Contains(u.Host))
                         return true;
                 }
-                return formhost.Contains(title) || (entryUrl != null && formhost.Contains(entryUrl));
+                return formHost.Contains(title) || (entryUrl != null && formHost.Contains(entryUrl));
             };
 
             return from e in listResult where filter(e.entry) select e;
@@ -309,8 +310,12 @@ namespace KeePassHttp {
                     if (sortSubmiturl.LastIndexOf("/") > 7)
                     {
                         Uri sortBaseSubmithostURI = new Uri(sortSubmiturl);
-                        sortBaseSubmiturl = String.Format("{0}{1}{2}{3}", sortBaseSubmithostURI.Scheme,
-                            Uri.SchemeDelimiter, sortBaseSubmithostURI.Authority, sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/")));
+                        sortBaseSubmiturl = String.Format("{0}{1}{2}{3}",
+                            sortBaseSubmithostURI.Scheme,
+                            Uri.SchemeDelimiter,
+                            sortBaseSubmithostURI.Authority,
+                            sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/"))
+                        );
                     }
 
                     sortSubmiturl = sortSubmiturl.ToLower();
@@ -567,15 +572,50 @@ namespace KeePassHttp {
                     f.Key = r.Key;
                     f.Load += delegate { f.Activate(); };
                     f.ShowDialog(win);
+
                     if (f.KeyId != null)
                     {
                         var entry = GetConfigEntry(true);
-                        entry.Strings.Set(ASSOCIATE_KEY_PREFIX + f.KeyId, new ProtectedString(true, r.Key));
-                        entry.Touch(true);
-                        resp.Id = f.KeyId;
-                        resp.Success = true;
-                        SetResponseVerifier(resp, aes);
-                        UpdateUI(null);
+
+                        bool keyNameExists = true;
+                        while (keyNameExists)
+                        {
+                            DialogResult keyExistsResult = DialogResult.Yes;
+                            foreach (var s in entry.Strings)
+                            {
+                                if (s.Key == ASSOCIATE_KEY_PREFIX + f.KeyId)
+                                {
+                                    keyExistsResult = MessageBox.Show(
+                                        win,
+                                        "A shared encryption-key with the name \"" + f.KeyId + "\" already exists.\nDo you want to overwrite it?",
+                                        "Overwrite existing key?",
+                                        MessageBoxButtons.YesNo,
+                                        MessageBoxIcon.Warning,
+                                        MessageBoxDefaultButton.Button1
+                                    );
+                                    break;
+                                }
+                            }
+
+                            if (keyExistsResult == DialogResult.No)
+                            {
+                                f.ShowDialog(win);
+                            }
+                            else
+                            {
+                                keyNameExists = false;
+                            }
+                        }
+
+                        if (f.KeyId != null)
+                        {
+                            entry.Strings.Set(ASSOCIATE_KEY_PREFIX + f.KeyId, new ProtectedString(true, r.Key));
+                            entry.Touch(true);
+                            resp.Id = f.KeyId;
+                            resp.Success = true;
+                            SetResponseVerifier(resp, aes);
+                            UpdateUI(null);
+                        }
                     }
                 });
             }
