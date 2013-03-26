@@ -65,6 +65,7 @@ namespace KeePassHttp
         public const string SET_LOGIN = "set-login";
         public const string ASSOCIATE = "associate";
         public const string TEST_ASSOCIATE = "test-associate";
+        public const string GENERATE_PASSWORD = "generate-password";
 
         public string RequestType;
 
@@ -123,7 +124,7 @@ namespace KeePassHttp
         {
             RequestType = request;
 
-            if (request == Request.GET_LOGINS || request == Request.GET_ALL_LOGINS)
+            if (request == Request.GET_LOGINS || request == Request.GET_ALL_LOGINS || request == Request.GENERATE_PASSWORD)
                 Entries = new List<ResponseEntry>();
             else
                 Entries = null;

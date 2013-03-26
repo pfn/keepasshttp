@@ -190,6 +190,7 @@ namespace KeePassHttp
                     handlers.Add(Request.GET_LOGINS_COUNT, GetLoginsCountHandler);
                     handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
                     handlers.Add(Request.SET_LOGIN, SetLoginHandler);
+                    handlers.Add(Request.GENERATE_PASSWORD, GeneratePassword);
 
                     listener = new HttpListener();
                     listener.Prefixes.Add(HTTP_PREFIX + port + "/");
