@@ -59,15 +59,17 @@ The options dialog will appear:
 
 ## Troubleshooting
 
-If an error occures it will be shown as notification in system tray or as messagebox in KeePass.
+First: If an error occures it will be shown as notification in system tray or as message box in KeePass.
 
-If you are having problems with KeePassHttp, please tell us which versions of
-* KeePass
-* KeePassHttp
-* error message (if availbale)
-* clients
+Otherwise please check if it could be an error of the client you are using. For passIFox and chromeIPass you can [report an error here](https://github.com/pfn/passifox/issues/).
 
-you are using.
+
+If you are having problems with KeePassHttp, please tell us at least the following information:
+* version of KeePass
+* version of KeePassHttp
+* error message (if available)
+* used clients and their versions
+* URLs on which the problem occur (if available)
 
 ## URL matching: How does it work?
 
