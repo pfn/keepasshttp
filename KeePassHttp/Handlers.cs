@@ -27,6 +27,11 @@ namespace KeePassHttp {
             {
                 var url = new Uri(uri);
                 host = url.Host;
+
+                if (!url.IsDefaultPort)
+                {
+                    host += ":" + url.Port.ToString();
+                }
             }
             catch
             {
@@ -441,14 +446,13 @@ namespace KeePassHttp {
         {
             if (!VerifyRequest(r, aes))
                 return;
-            string submithost = null;
-            PwUuid uuid = null;
-            string username, password, url;
-            string realm = null;
-            url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
+
+            string url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
             var formhost = GetHost(url);
-            if (r.SubmitUrl != null)
-                submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+
+            PwUuid uuid = null;
+            string username, password;
+            string realm = null;
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
 
@@ -520,7 +524,7 @@ namespace KeePassHttp {
             }
             else
             {
-                // creating new entry
+                // create new entry
                 var root = host.Database.RootGroup;
                 var group = root.FindCreateGroup(KEEPASSHTTP_GROUP_NAME, false);
                 if (group == null)
@@ -530,11 +534,22 @@ namespace KeePassHttp {
                     UpdateUI(null);
                 }
 
+                string submithost = null;
+                if (r.SubmitUrl != null)
+                    submithost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+
+                string baseUrl = url;
+                // index bigger than https:// <-- this slash
+                if (baseUrl.LastIndexOf("/") > 9)
+                {
+                    baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
+                }
+
                 PwEntry entry = new PwEntry(true, true);
                 entry.Strings.Set(PwDefs.TitleField, new ProtectedString(false, formhost));
                 entry.Strings.Set(PwDefs.UserNameField, new ProtectedString(false, username));
                 entry.Strings.Set(PwDefs.PasswordField, new ProtectedString(true, password));
-                entry.Strings.Set(PwDefs.UrlField, new ProtectedString(true, url));
+                entry.Strings.Set(PwDefs.UrlField, new ProtectedString(true, baseUrl));
                 
                 if ((submithost != null && formhost != submithost) || realm != null)
                 {
