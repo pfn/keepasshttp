@@ -22,6 +22,13 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and
  3. On linux systems you maybe need to install mono-complete: `$ apt-get install mono-complete`
  4. Restart KeePass
 
+### KeePassHttp on Linux and Mac
+If you are using KeePass with Mono, then you're in luck.
+Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
+He cannot get the plgx file to work on Linux, perhaps you may have more luck, but he can get his dll files to work directly when put into the KeePass directory (possibly the Plugin directory as well, he has not tried).
+
+You can get KeePassHttp.dll and Newtonsoft.Json.dll from https://github.com/pfn/keepasshttp/tree/master/KeePassHttp/mono-users/
+
 ## System requirements
  * KeePass 2.17 or higher
  * For Windows: Windows XP SP3 or higher

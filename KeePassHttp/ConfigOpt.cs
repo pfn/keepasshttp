@@ -11,6 +11,8 @@ namespace KeePassHttp
         const string AlwaysAllowAccessKey = "KeePassHttp_AlwaysAllowAccess";
         const string AlwaysAllowUpdatesKey = "KeePassHttp_AlwaysAllowUpdates";
         const string SearchInAllOpenedDatabasesKey = "KeePassHttp_SearchInAllOpenedDatabases";
+        const string MatchSchemesKey = "KeePassHttp_MatchSchemes";
+        const string ReturnStringFieldsKey = "KeePassHttp_ReturnStringFields";
 
         public ConfigOpt(AceCustomConfig config)
         {
@@ -51,6 +53,18 @@ namespace KeePassHttp
         {
             get { return _config.GetBool(SearchInAllOpenedDatabasesKey, false); }
             set { _config.SetBool(SearchInAllOpenedDatabasesKey, value); }
+        }
+
+        public bool MatchSchemes
+        {
+            get { return _config.GetBool(MatchSchemesKey, false); }
+            set { _config.SetBool(MatchSchemesKey, value); }
+        }
+
+        public bool ReturnStringFields
+        {
+            get { return _config.GetBool(ReturnStringFieldsKey, false); }
+            set { _config.SetBool(ReturnStringFieldsKey, value); }
         }
     }
 }

@@ -18,6 +18,7 @@ using KeePassLib.Security;
 using Newtonsoft.Json;
 using KeePass.Util.Spr;
 using KeePassLib.Serialization;
+using System.Resources;
 
 namespace KeePassHttp
 {
