@@ -27,7 +27,7 @@ If you are using KeePass with Mono, then you're in luck.
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 He cannot get the plgx file to work on Linux, perhaps you may have more luck, but he can get his dll files to work directly when put into the KeePass directory (possibly the Plugin directory as well, he has not tried).
 
-You can get KeePassHttp.dll and Newtonsoft.Json.dll from https://github.com/pfn/keepasshttp/tree/master/KeePassHttp/mono-users/
+You can get KeePassHttp.dll and Newtonsoft.Json.dll from https://github.com/pfn/keepasshttp/tree/master/KeePassHttp/mono/
 
 ## System requirements
  * KeePass 2.17 or higher
@@ -51,18 +51,24 @@ You can open the options dialog with menu: Tools > KeePassHttp Options...
 
 The options dialog will appear:
 
-![menu](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options.jpg)
+![options-general](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png)
 
 1. show a notification balloon whenever entries are delivered to the inquirer.
 2. returns only the best matching entries for the given url, otherwise all entries for a domain are send
   - e.g. of two entries with the URLs http://example.org and http://example.org/, only the second one will returned if the requested URL is http://example.org/index.html
 3. if the active database in KeePass is locked, KeePassHttp sends a request to unlock the database. Now KeePass opens and the user has to enter the master password to unlock the database. Otherwise KeePassHttp tells the inquirer that the database is closed.
-4. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
-5. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
-6. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
+4. KeePassHttp returns only these entries which match the scheme of the given URL
+  - given URL: https://example.org --> scheme: https:// --> only entries whose URL starts with https://
+5. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
+6. removes all stored permissions in the entries of the currently selected database.  
+  .  
+  ![options-advanced](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
+7. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
+8. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
+9. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
-7. Removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
-8. Removes all stored permissions in the entries of the currently selected database.
+10. if activated KeePassHttp also search for string fields which are defined in the found entries and start with "KPH: " (note the space after colon). These will also be transfered to the client. You can set string fields in the tab _Advanced_ of an entry.  
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png" alt="advanced tab of an entry" width="200px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png)
 
 ## Troubleshooting
 
