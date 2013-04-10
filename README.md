@@ -27,7 +27,7 @@ If you are using KeePass with Mono, then you're in luck.
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 He cannot get the plgx file to work on Linux, perhaps you may have more luck, but he can get his dll files to work directly when put into the KeePass directory (possibly the Plugin directory as well, he has not tried).
 
-You can get KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono)
+You can get KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono).
 
 ## System requirements
  * KeePass 2.17 or higher
@@ -67,7 +67,7 @@ The options dialog will appear:
 8. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
 9. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
-10. if activated KeePassHttp also search for string fields which are defined in the found entries and start with "KPH: " (note the space after colon). These will also be transfered to the client. You can set string fields in the tab _Advanced_ of an entry.  
+10. if activated KeePassHttp also search for string fields which are defined in the found entries and start with "KPH: " (note the space after colon). __The string fields will be transfered to the client in alphabetical order__. You can set string fields in the tab _Advanced_ of an entry.  
 [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png" alt="advanced tab of an entry" width="200px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png)
 
 ## Troubleshooting

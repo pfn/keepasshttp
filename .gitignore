@@ -6,3 +6,4 @@ create-plgx.bat
 /#portable/
 *.cer
 *.pvk
+/KeePassHttp/KeePassHttp.dll
