@@ -179,6 +179,8 @@ namespace KeePassHttp
 
             var optionsMenu = new ToolStripMenuItem("KeePassHttp Options...");
             optionsMenu.Click += OnOptions_Click;
+            optionsMenu.Image = KeePassHttp.Properties.Resources.earth_lock;
+            //optionsMenu.Image = global::KeePass.Properties.Resources.B16x16_File_Close;
             this.host.MainWindow.ToolsMenu.DropDownItems.Add(optionsMenu);
 
             if (httpSupported)
@@ -316,7 +318,9 @@ namespace KeePassHttp
                     host.MainWindow.EnsureVisibleForegroundWindow(true, true);
                 });
 
-                if (!db.IsOpen)
+                // UnlockDialog not already opened
+                bool bNoDialogOpened = (KeePass.UI.GlobalWindowManager.WindowCount == 0);
+                if (!db.IsOpen && bNoDialogOpened)
                 {
                     host.MainWindow.Invoke((MethodInvoker)delegate
                     {
