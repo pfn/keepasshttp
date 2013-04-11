@@ -197,7 +197,7 @@ namespace KeePassHttp
         public string Password;
         public string Uuid;
         public string Name;
-        public List<ResponseStringField> StringFields { get; set; }
+        public List<ResponseStringField> StringFields = null;
     }
     public class ResponseStringField
     {

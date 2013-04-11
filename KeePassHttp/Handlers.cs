@@ -507,7 +507,10 @@ namespace KeePassHttp {
                     if (sf.Key.StartsWith("KPH: "))
                     {
                         var sfValue = entryDatabase.entry.Strings.ReadSafe(sf.Key);
-                        fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
+                        if (sfValue != null)
+                        {
+                            fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
+                        }
                     }
                 }
 
