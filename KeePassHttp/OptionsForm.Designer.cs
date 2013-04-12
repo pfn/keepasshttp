@@ -33,21 +33,23 @@
             this.okButton = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.SortByUsernameRadioButton = new System.Windows.Forms.RadioButton();
+            this.SortByTitleRadioButton = new System.Windows.Forms.RadioButton();
+            this.matchSchemesCheckbox = new System.Windows.Forms.CheckBox();
             this.removePermissionsButton = new System.Windows.Forms.Button();
             this.unlockDatabaseCheckbox = new System.Windows.Forms.CheckBox();
             this.removeButton = new System.Windows.Forms.Button();
             this.credMatchingCheckbox = new System.Windows.Forms.CheckBox();
             this.credNotifyCheckbox = new System.Windows.Forms.CheckBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.returnStringFieldsCheckbox = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.credSearchInAllOpenedDatabases = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.credAllowUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.credAllowAccessCheckbox = new System.Windows.Forms.CheckBox();
-            this.matchSchemesCheckbox = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.returnStringFieldsCheckbox = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -92,6 +94,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.SortByUsernameRadioButton);
+            this.tabPage1.Controls.Add(this.SortByTitleRadioButton);
             this.tabPage1.Controls.Add(this.matchSchemesCheckbox);
             this.tabPage1.Controls.Add(this.removePermissionsButton);
             this.tabPage1.Controls.Add(this.unlockDatabaseCheckbox);
@@ -106,34 +110,49 @@
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // SortByUsernameRadioButton
             // 
-            this.tabPage2.Controls.Add(this.label4);
-            this.tabPage2.Controls.Add(this.label3);
-            this.tabPage2.Controls.Add(this.returnStringFieldsCheckbox);
-            this.tabPage2.Controls.Add(this.label2);
-            this.tabPage2.Controls.Add(this.credSearchInAllOpenedDatabases);
-            this.tabPage2.Controls.Add(this.label1);
-            this.tabPage2.Controls.Add(this.credAllowUpdatesCheckbox);
-            this.tabPage2.Controls.Add(this.credAllowAccessCheckbox);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(402, 259);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Advanced";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.SortByUsernameRadioButton.AutoSize = true;
+            this.SortByUsernameRadioButton.Location = new System.Drawing.Point(7, 124);
+            this.SortByUsernameRadioButton.Name = "SortByUsernameRadioButton";
+            this.SortByUsernameRadioButton.Size = new System.Drawing.Size(171, 17);
+            this.SortByUsernameRadioButton.TabIndex = 19;
+            this.SortByUsernameRadioButton.TabStop = true;
+            this.SortByUsernameRadioButton.Text = "Sort found entries by &username";
+            this.SortByUsernameRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // SortByTitleRadioButton
+            // 
+            this.SortByTitleRadioButton.AutoSize = true;
+            this.SortByTitleRadioButton.Location = new System.Drawing.Point(7, 147);
+            this.SortByTitleRadioButton.Name = "SortByTitleRadioButton";
+            this.SortByTitleRadioButton.Size = new System.Drawing.Size(141, 17);
+            this.SortByTitleRadioButton.TabIndex = 18;
+            this.SortByTitleRadioButton.TabStop = true;
+            this.SortByTitleRadioButton.Text = "Sort found entries by &title";
+            this.SortByTitleRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // matchSchemesCheckbox
+            // 
+            this.matchSchemesCheckbox.AutoSize = true;
+            this.matchSchemesCheckbox.Location = new System.Drawing.Point(7, 88);
+            this.matchSchemesCheckbox.Name = "matchSchemesCheckbox";
+            this.matchSchemesCheckbox.Size = new System.Drawing.Size(375, 30);
+            this.matchSchemesCheckbox.TabIndex = 17;
+            this.matchSchemesCheckbox.Text = "&Match URL schemes\r\nonly entries with the same scheme (http://, https://, ftp://," +
+    " ...) are returned";
+            this.matchSchemesCheckbox.UseVisualStyleBackColor = true;
             // 
             // removePermissionsButton
             // 
             this.removePermissionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removePermissionsButton.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.removePermissionsButton.Location = new System.Drawing.Point(14, 170);
+            this.removePermissionsButton.Location = new System.Drawing.Point(14, 216);
             this.removePermissionsButton.Name = "removePermissionsButton";
             this.removePermissionsButton.Size = new System.Drawing.Size(372, 28);
             this.removePermissionsButton.TabIndex = 16;
-            this.removePermissionsButton.Text = "Re&move all stored permissions from entries in active database";
+            this.removePermissionsButton.Text = "Remo&ve all stored permissions from entries in active database";
             this.removePermissionsButton.UseVisualStyleBackColor = true;
             // 
             // unlockDatabaseCheckbox
@@ -150,7 +169,7 @@
             // 
             this.removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.removeButton.Location = new System.Drawing.Point(14, 136);
+            this.removeButton.Location = new System.Drawing.Point(14, 182);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(372, 28);
             this.removeButton.TabIndex = 11;
@@ -177,6 +196,62 @@
             this.credNotifyCheckbox.TabIndex = 8;
             this.credNotifyCheckbox.Text = "Sh&ow a notification when credentials are requested";
             this.credNotifyCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.label4);
+            this.tabPage2.Controls.Add(this.label3);
+            this.tabPage2.Controls.Add(this.returnStringFieldsCheckbox);
+            this.tabPage2.Controls.Add(this.label2);
+            this.tabPage2.Controls.Add(this.credSearchInAllOpenedDatabases);
+            this.tabPage2.Controls.Add(this.label1);
+            this.tabPage2.Controls.Add(this.credAllowUpdatesCheckbox);
+            this.tabPage2.Controls.Add(this.credAllowAccessCheckbox);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(402, 259);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Advanced";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(53, 225);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(277, 26);
+            this.label4.TabIndex = 22;
+            this.label4.Text = "Automatic creates or updates are not supported\r\nfor string fields!";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(52, 156);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(302, 65);
+            this.label3.TabIndex = 21;
+            this.label3.Text = resources.GetString("label3.Text");
+            // 
+            // returnStringFieldsCheckbox
+            // 
+            this.returnStringFieldsCheckbox.AutoSize = true;
+            this.returnStringFieldsCheckbox.Location = new System.Drawing.Point(7, 136);
+            this.returnStringFieldsCheckbox.Name = "returnStringFieldsCheckbox";
+            this.returnStringFieldsCheckbox.Size = new System.Drawing.Size(303, 17);
+            this.returnStringFieldsCheckbox.TabIndex = 20;
+            this.returnStringFieldsCheckbox.Text = "&Return also advanced string fields which start with \"KPH: \"";
+            this.returnStringFieldsCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(52, 108);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(299, 13);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "Only the selected database has to be connected with a client!";
             // 
             // credSearchInAllOpenedDatabases
             // 
@@ -218,55 +293,6 @@
             this.credAllowAccessCheckbox.TabIndex = 15;
             this.credAllowAccessCheckbox.Text = "Always allow &access to entries";
             this.credAllowAccessCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // matchSchemesCheckbox
-            // 
-            this.matchSchemesCheckbox.AutoSize = true;
-            this.matchSchemesCheckbox.Location = new System.Drawing.Point(7, 88);
-            this.matchSchemesCheckbox.Name = "matchSchemesCheckbox";
-            this.matchSchemesCheckbox.Size = new System.Drawing.Size(375, 30);
-            this.matchSchemesCheckbox.TabIndex = 17;
-            this.matchSchemesCheckbox.Text = "&Match URL schemes\r\nonly entries with the same scheme (http://, https://, ftp://," +
-    " ...) are returned";
-            this.matchSchemesCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(52, 108);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(299, 13);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "Only the selected database has to be connected with a client!";
-            // 
-            // returnStringFieldsCheckbox
-            // 
-            this.returnStringFieldsCheckbox.AutoSize = true;
-            this.returnStringFieldsCheckbox.Location = new System.Drawing.Point(7, 136);
-            this.returnStringFieldsCheckbox.Name = "returnStringFieldsCheckbox";
-            this.returnStringFieldsCheckbox.Size = new System.Drawing.Size(303, 17);
-            this.returnStringFieldsCheckbox.TabIndex = 20;
-            this.returnStringFieldsCheckbox.Text = "&Return also advanced string fields which start with \"KPH: \"";
-            this.returnStringFieldsCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(52, 156);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(302, 65);
-            this.label3.TabIndex = 21;
-            this.label3.Text = resources.GetString("label3.Text");
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(53, 225);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(277, 26);
-            this.label4.TabIndex = 22;
-            this.label4.Text = "Automatic creates or updates are not supported\r\nfor string fields!";
             // 
             // OptionsForm
             // 
@@ -315,5 +341,7 @@
         private System.Windows.Forms.CheckBox returnStringFieldsCheckbox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.RadioButton SortByUsernameRadioButton;
+        private System.Windows.Forms.RadioButton SortByTitleRadioButton;
     }
 }

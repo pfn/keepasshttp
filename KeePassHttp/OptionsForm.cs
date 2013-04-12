@@ -42,6 +42,8 @@ namespace KeePassHttp
             credSearchInAllOpenedDatabases.Checked = _config.SearchInAllOpenedDatabases;
             matchSchemesCheckbox.Checked = _config.MatchSchemes;
             returnStringFieldsCheckbox.Checked = _config.ReturnStringFields;
+            SortByUsernameRadioButton.Checked = _config.SortResultByUsername;
+            SortByTitleRadioButton.Checked = !_config.SortResultByUsername;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -54,6 +56,7 @@ namespace KeePassHttp
             _config.SearchInAllOpenedDatabases = credSearchInAllOpenedDatabases.Checked;
             _config.MatchSchemes = matchSchemesCheckbox.Checked;
             _config.ReturnStringFields = returnStringFieldsCheckbox.Checked;
+            _config.SortResultByUsername = SortByUsernameRadioButton.Checked;
         }
 
         private void removeButton_Click(object sender, EventArgs e)

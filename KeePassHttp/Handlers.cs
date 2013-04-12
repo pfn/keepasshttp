@@ -344,13 +344,15 @@ namespace KeePassHttp {
                     }
                 }
 
-                if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
-                {
+                //if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
+                //{
                     string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
                     if (sortHost.EndsWith("/"))
                         sortHost = sortHost.Substring(0, sortHost.Length - 1);
 
-                    string sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                    string sortSubmiturl = null;
+                    if(r.SubmitUrl != null)
+                        sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
                     if (sortSubmiturl == null)
                         sortSubmiturl = String.Copy(sortHost);
                     if (sortSubmiturl.EndsWith("/"))
@@ -419,38 +421,45 @@ namespace KeePassHttp {
                         else
                             entryDatabase.entry.UsageCount = 1;
                     }
+                //}
 
-                    var items2 = from e in items orderby e.entry.UsageCount descending select e;
-                    items = items2;
-                }
+                var itemsList = items.ToList();
 
                 if (configOpt.SpecificMatchingOnly)
                 {
                     ulong highestCount = 0;
-                    foreach (var entryDatabase in items)
+                    foreach (var entryDatabase in itemsList.ToList())
                     {
                         if (highestCount == 0)
                         {
                             highestCount = entryDatabase.entry.UsageCount;
                         }
 
-                        if (entryDatabase.entry.UsageCount == highestCount)
+                        if (entryDatabase.entry.UsageCount != highestCount)
                         {
-                            var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
-                            resp.Entries.Add(e);
+                            itemsList.Remove(entryDatabase);
                         }
                     }
                 }
+
+                if (configOpt.SortResultByUsername)
+                {
+                    var items2 = from e in itemsList orderby e.entry.UsageCount descending, GetUserPass(e)[0] ascending select e;
+                    itemsList = items2.ToList();
+                }
                 else
                 {
-                    foreach (var entryDatabase in items)
-                    {
-                        var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
-                        resp.Entries.Add(e);
-                    }
+                    var items2 = from e in itemsList orderby e.entry.UsageCount descending, e.entry.Strings.ReadSafe(PwDefs.TitleField) ascending select e;
+                    itemsList = items2.ToList();
                 }
 
-                if (items.ToList().Count > 0)
+                foreach (var entryDatabase in itemsList)
+                {
+                    var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
+                    resp.Entries.Add(e);
+                }
+
+                if (itemsList.Count > 0)
                 {
                     var names = (from e in resp.Entries select e.Name).Distinct<string>();
                     var n = String.Join("\n    ", names.ToArray<string>());
@@ -507,10 +516,7 @@ namespace KeePassHttp {
                     if (sf.Key.StartsWith("KPH: "))
                     {
                         var sfValue = entryDatabase.entry.Strings.ReadSafe(sf.Key);
-                        if (sfValue != null)
-                        {
-                            fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
-                        }
+                        fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
                     }
                 }
 

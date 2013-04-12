@@ -13,6 +13,7 @@ namespace KeePassHttp
         const string SearchInAllOpenedDatabasesKey = "KeePassHttp_SearchInAllOpenedDatabases";
         const string MatchSchemesKey = "KeePassHttp_MatchSchemes";
         const string ReturnStringFieldsKey = "KeePassHttp_ReturnStringFields";
+        const string SortResultByUsernameKey = "KeePassHttp_SortResultByUsername";
 
         public ConfigOpt(AceCustomConfig config)
         {
@@ -65,6 +66,12 @@ namespace KeePassHttp
         {
             get { return _config.GetBool(ReturnStringFieldsKey, false); }
             set { _config.SetBool(ReturnStringFieldsKey, value); }
+        }
+
+        public bool SortResultByUsername
+        {
+            get { return _config.GetBool(SortResultByUsernameKey, true); }
+            set { _config.SetBool(SortResultByUsernameKey, value); }
         }
     }
 }
