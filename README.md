@@ -29,7 +29,7 @@ He cannot get the plgx file to work on Linux, perhaps you may have more luck, bu
 
 You can get KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono).
 
-#### Experience report from Johann Fot
+#### Experience report by Johann Fot
 Just wanted to let you know, i'm running Fedora 18, which currently uses
 mono v2.10.8:
 ~~~
