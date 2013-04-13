@@ -29,6 +29,30 @@ He cannot get the plgx file to work on Linux, perhaps you may have more luck, bu
 
 You can get KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono).
 
+#### Experience report from Johann Fot
+Just wanted to let you know, i'm running Fedora 18, which currently uses
+mono v2.10.8:
+~~~
+> mono-core.x86_64                       2.10.8-3.fc18                     @fedora
+> mono-data.x86_64                       2.10.8-3.fc18                     @fedora
+> mono-data-sqlite.x86_64                2.10.8-3.fc18                     @fedora
+> mono-extras.x86_64                     2.10.8-3.fc18                     @fedora
+> mono-mvc.x86_64                        2.10.8-3.fc18                     @fedora
+> mono-wcf.x86_64                        2.10.8-3.fc18                     @fedora
+> mono-web.x86_64                        2.10.8-3.fc18                     @fedora
+> mono-winforms.x86_64                   2.10.8-3.fc18                     @fedora
+> mono-winfx.x86_64                      2.10.8-3.fc18                     @fedora
+~~~
+
+I have no problems using "KeePassHttp.plgx". I simply dropped the .plgx-file in my KeePass folder, and it works.
+
+I'm currently using KeePass v2.22.  
+Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it
+worked fine too.
+
+Usually i only use chromeipass, but I did a short test
+with passifox and seems to be working just fine.
+
 ## System requirements
  * KeePass 2.17 or higher
  * For Windows: Windows XP SP3 or higher
