@@ -23,14 +23,18 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and
  4. Restart KeePass
 
 ### KeePassHttp on Linux and Mac
-If you are using KeePass with Mono, then you're in luck.
-Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
-He cannot get the plgx file to work on Linux, perhaps you may have more luck, but he can get his dll files to work directly when put into the KeePass directory (possibly the Plugin directory as well, he has not tried).
 
-You can get KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono).
+KeePass needs Mono. You can find detailed [installation insructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
+
+Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
+With Mono 2.6.7 and a version of KeePass lower than 2.20 he could not get the plgx file to work on linux.
+If the plgx file does also not work for you, you can try the two DLL files KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono) which should work for you.
+
+With newer versions of Mono and KeePass it seems that the plgx file works pretty fine.
+More information about it are contained in the following experience report.
 
 #### Experience report by Johann Fot
-Just wanted to let you know, i'm running Fedora 18, which currently uses
+Just wanted to let you know, I'm running Fedora 18, which currently uses
 mono v2.10.8:
 ~~~
 > mono-core.x86_64                       2.10.8-3.fc18                     @fedora
@@ -50,8 +54,8 @@ I'm currently using KeePass v2.22.
 Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it
 worked fine too.
 
-Usually i only use chromeipass, but I did a short test
-with passifox and seems to be working just fine.
+Usually I only use chromeIPass, but I did a short test
+with PassIFox and seems to be working just fine.
 
 ## System requirements
  * KeePass 2.17 or higher
