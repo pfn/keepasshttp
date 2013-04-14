@@ -75,11 +75,11 @@ KeePassHttp works out-of-the-box. You don't have to explicitely configure it.
 
 You can open the options dialog with menu: Tools > KeePassHttp Options...
 
-![menu](https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg)
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg" alt="menu" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg)
 
 The options dialog will appear:
 
-![options-general](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png)
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png" alt="options-general" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png)
 
 1. show a notification balloon whenever entries are delivered to the inquirer.
 2. returns only the best matching entries for the given url, otherwise all entries for a domain are send
@@ -88,15 +88,29 @@ The options dialog will appear:
 4. KeePassHttp returns only these entries which match the scheme of the given URL
   - given URL: https://example.org --> scheme: https:// --> only entries whose URL starts with https://
 5. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
-6. removes all stored permissions in the entries of the currently selected database.  
+6. removes all stored permissions in the entries of the currently selected database.
+7. Sort found entries by username or title  
   .  
-  ![options-advanced](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
-7. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
-8. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
-9. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
+  [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png" alt="options-advanced" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
+8. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
+9. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
+10. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
-10. if activated KeePassHttp also search for string fields which are defined in the found entries and start with "KPH: " (note the space after colon). __The string fields will be transfered to the client in alphabetical order__. You can set string fields in the tab _Advanced_ of an entry.  
-[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png" alt="advanced tab of an entry" width="200px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png)
+11. if activated KeePassHttp also search for string fields which are defined in the found entries and start with "KPH: " (note the space after colon). __The string fields will be transfered to the client in alphabetical order__. You can set string fields in the tab _Advanced_ of an entry.  
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png" alt="advanced tab of an entry" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/advanced-string-fields.png)
+
+## Tips and Tricks
+
+### Support multiple URLs for one username + password
+This is already implemented directly in KeePass.
+
+1. Open the context menu of an entry by clicking right on it and select _Duplicate entry_:  
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/keepass-context-menu.png" alt="context-menu-entry" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/keepass-context-menu.png)
+
+2. Check the option to use references for username and password:  
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/keepass-duplicate-entry-references.png" alt="mark checkbox references" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/keepass-duplicate-entry-references.png)
+
+3. You can change the title, URL and evertything of the copied entry, but not the username and password. These fields contain a _Reference Key_ which refers to the _master entry_ you copied from.
 
 ## Troubleshooting
 
