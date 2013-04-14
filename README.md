@@ -33,7 +33,7 @@ If the plgx file does also not work for you, you can try the two DLL files KeePa
 With newer versions of Mono and KeePass it seems that the plgx file works pretty fine.
 More information about it are contained in the following experience report.
 
-#### Experience report by Johann Fot
+#### Experience report by dunkelfuerst
 Just wanted to let you know, I'm running Fedora 18, which currently uses
 mono v2.10.8:
 ~~~
