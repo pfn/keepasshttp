@@ -136,6 +136,8 @@ In old versions the explaining first part of the message does not exist!
 This error occurs because you have multiple copies of KeePassHttp in your KeePass directory! Please check __all__ PLGX- and DLL-files in your _KeePass directory and all sub-directories_ whether they are a copy of KeePassHttp.  
 __Note:__ KeePass does _not_ detect plugins by filename but by extension! If you rename _KeePassHttp.plgx_ to _HelloWorld.plgx_ it is still a valid copy of KeePassHttp.
 
+If you _really_ have only one copy of KeePassHttp in your KeePass directory another application seems to use port 19455 to wait for signals. In this case try to stop all applications and restart everyone again while checking if the error still occurs.
+
 ## URL matching: How does it work?
 
 KeePassHttp can receive 2 different URLs, called URL and SubmitURL.
