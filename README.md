@@ -1,6 +1,6 @@
 # KeePassHttp
 
-is a plugin for KeePass and provides a secure means of exposing KeePass entries via HTTP for clients to
+is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
 
 This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and chromeIPass for Google Chrome](https://github.com/pfn/passifox/).
@@ -15,6 +15,12 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and
  * request for unlocking the database if it is locked while connecting
  * searches in all opened databases (if user activates this feature)
  * Whenever events occur, the user is prompted either by tray notification or requesting interaction (allow/deny/remember).
+
+## System requirements
+ * KeePass 2.17 or higher
+ * For Windows: Windows XP SP3 or higher
+ * For Linux: installed mono
+ * For Mac: installed mono | it seems to fully support KeePassHttp, but we cannot test it
 
 ## Installation
  1. Download [KeePassHttp](https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx)
@@ -56,12 +62,6 @@ worked fine too.
 
 Usually I only use chromeIPass, but I did a short test
 with PassIFox and seems to be working just fine.
-
-## System requirements
- * KeePass 2.17 or higher
- * For Windows: Windows XP SP3 or higher
- * For Linux: installed mono
- * For Mac: installed mono | it seems to fully support KeePassHttp, but we cannot test it
 
 ## Configuration and Options
 
