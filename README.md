@@ -114,7 +114,7 @@ This is already implemented directly in KeePass.
 
 ## Troubleshooting
 
-First: If an error occures it will be shown as notification in system tray or as message box in KeePass.
+__First:__ If an error occures it will be shown as notification in system tray or as message box in KeePass.
 
 Otherwise please check if it could be an error of the client you are using. For passIFox and chromeIPass you can [report an error here](https://github.com/pfn/passifox/issues/).
 
@@ -125,6 +125,16 @@ If you are having problems with KeePassHttp, please tell us at least the followi
 * error message (if available)
 * used clients and their versions
 * URLs on which the problem occur (if available)
+
+### HTTP Listener error message
+
+Maybe you get the following error message:  
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/http-listener-error.png" alt="http listener error" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/http-listener-error.png)
+
+In old versions the explaining first part of the message does not exist!
+
+This error occurs because you have multiple copies of KeePassHttp in your KeePass directory! Please check __all__ PLGX- and DLL-files in your _KeePass directory and all sub-directories_ whether they are a copy of KeePassHttp.  
+__Note:__ KeePass does _not_ detect plugins by filename but by extension! If you rename _KeePassHttp.plgx_ to _HelloWorld.plgx_ it is still a valid copy of KeePassHttp.
 
 ## URL matching: How does it work?
 
