@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartAction>Program</StartAction>
+    <StartProgram>P:\dev\C#\keepasshttp\KeePassHttp\bin\Debug\KeePass.exe</StartProgram>
+  </PropertyGroup>
 </Project>

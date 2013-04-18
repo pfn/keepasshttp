@@ -190,14 +190,14 @@ namespace KeePassHttp {
                 if (entryUrl != null && (entryUrl.StartsWith("http://") || entryUrl.StartsWith("https://") || title.StartsWith("ftp://") || title.StartsWith("sftp://")))
                 {
                     var uHost = GetHost(entryUrl);
-                    if (uHost.EndsWith(formHost))
+                    if (formHost.EndsWith(uHost))
                         return true;
                 }
 
                 if (title.StartsWith("http://") || title.StartsWith("https://") || title.StartsWith("ftp://") || title.StartsWith("sftp://"))
                 {
                     var uHost = GetHost(title);
-                    if (uHost.EndsWith(formHost))
+                    if (formHost.EndsWith(uHost))
                         return true;
                 }
                 return formHost.Contains(title) || (entryUrl != null && formHost.Contains(entryUrl));
