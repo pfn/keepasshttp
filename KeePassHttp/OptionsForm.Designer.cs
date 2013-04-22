@@ -154,6 +154,7 @@
             this.removePermissionsButton.TabIndex = 16;
             this.removePermissionsButton.Text = "Remo&ve all stored permissions from entries in active database";
             this.removePermissionsButton.UseVisualStyleBackColor = true;
+            this.removePermissionsButton.Click += new System.EventHandler(this.removePermissionsButton_Click);
             // 
             // unlockDatabaseCheckbox
             // 
@@ -175,6 +176,7 @@
             this.removeButton.TabIndex = 11;
             this.removeButton.Text = "R&emove all shared encryption-keys from active database";
             this.removeButton.UseVisualStyleBackColor = true;
+            this.removeButton.Click += new System.EventHandler(this.removeButton_Click);
             // 
             // credMatchingCheckbox
             // 

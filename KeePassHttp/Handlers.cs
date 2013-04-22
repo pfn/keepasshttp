@@ -283,64 +283,39 @@ namespace KeePassHttp {
 
                 if (needPrompting.ToList().Count > 0 && !autoAllow)
                 {
-                    var clicked = true;
+                    var win = this.host.MainWindow;
 
-                    if (canShowBalloonTips())
+                    using (var f = new AccessControlForm())
                     {
-                        clicked = false;
-                        var wait = new ManualResetEvent(false);
-                        var delegated = false;
-                        EventHandler onclick = delegate { delegated = true; clicked = true; wait.Set(); };
-                        EventHandler onclose = delegate { delegated = true; wait.Set(); };
-
-                        ShowNotification(String.Format(
-                                "{0}: {1} is requesting access, click to allow or deny",
-                                r.Id, submithost != null ? submithost : host), onclick, onclose);
-                        wait.WaitOne(GetNotificationTime() + 5000); // give a little time to fade
-                        if (!delegated)
-                            resp.Error = "Notification bubble did not appear";
-                    }
-
-                    if (clicked)
-                    {
-                        var win = this.host.MainWindow;
-
-                        using (var f = new AccessControlForm())
+                        win.Invoke((MethodInvoker)delegate
                         {
-                            win.Invoke((MethodInvoker)delegate
+                            f.Icon = win.Icon;
+                            f.Plugin = this;
+                            f.Entries = (from e in items where filter(e.entry) select e.entry).ToList();
+                            //f.Entries = needPrompting.ToList();
+                            f.Host = submithost != null ? submithost : host;
+                            f.Load += delegate { f.Activate(); };
+                            f.ShowDialog(win);
+                            if (f.Remember && (f.Allowed || f.Denied))
                             {
-                                f.Icon = win.Icon;
-                                f.Plugin = this;
-                                f.Entries = (from e in items where filter(e.entry) select e.entry).ToList();
-                                //f.Entries = needPrompting.ToList();
-                                f.Host = submithost != null ? submithost : host;
-                                f.Load += delegate { f.Activate(); };
-                                f.ShowDialog(win);
-                                if (f.Remember && (f.Allowed || f.Denied))
+                                foreach (var e in needPrompting)
                                 {
-                                    foreach (var e in needPrompting)
-                                    {
-                                        var c = GetEntryConfig(e.entry);
-                                        if (c == null)
-                                            c = new KeePassHttpEntryConfig();
-                                        var set = f.Allowed ? c.Allow : c.Deny;
-                                        set.Add(host);
-                                        if (submithost != null && submithost != host)
-                                            set.Add(submithost);
-                                        SetEntryConfig(e.entry, c);
+                                    var c = GetEntryConfig(e.entry);
+                                    if (c == null)
+                                        c = new KeePassHttpEntryConfig();
+                                    var set = f.Allowed ? c.Allow : c.Deny;
+                                    set.Add(host);
+                                    if (submithost != null && submithost != host)
+                                        set.Add(submithost);
+                                    SetEntryConfig(e.entry, c);
 
-                                    }
                                 }
-                                if (!f.Allowed)
-                                {
-                                    items = items.Except(needPrompting);
-                                }
-                            });
-                        }
-                    }
-                    else
-                    {
-                        items = items.Except(needPrompting);
+                            }
+                            if (!f.Allowed)
+                            {
+                                items = items.Except(needPrompting);
+                            }
+                        });
                     }
                 }
 
@@ -581,7 +556,7 @@ namespace KeePassHttp {
                 var win = host.MainWindow;
                 win.Invoke((MethodInvoker)delegate
                 {
-                    ShowNotification("New key association requested", (s, e) => f.Activate());
+                    f.Activate();
                     f.Icon = win.Icon;
                     f.Key = r.Key;
                     f.Load += delegate { f.Activate(); };
@@ -740,12 +715,7 @@ namespace KeePassHttp {
 
                 if (!allowUpdate)
                 {
-                    if (canShowBalloonTips())
-                    {
-                        ShowNotification(String.Format(
-                            "{0}:  You have an entry change prompt waiting, click to activate", requestId),
-                            (s, e) => host.MainWindow.Activate());
-                    }
+                    host.MainWindow.Activate();
 
                     DialogResult result;
                     if (host.MainWindow.IsTrayed())
