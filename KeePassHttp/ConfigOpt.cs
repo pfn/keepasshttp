@@ -28,7 +28,7 @@ namespace KeePassHttp
 
         public bool UnlockDatabaseRequest
         {
-            get { return _config.GetBool(UnlockDatabaseRequestKey, true); }
+            get { return _config.GetBool(UnlockDatabaseRequestKey, false); }
             set { _config.SetBool(UnlockDatabaseRequestKey, value); }
         }
 
