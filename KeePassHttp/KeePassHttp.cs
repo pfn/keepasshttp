@@ -307,11 +307,30 @@ namespace KeePassHttp
             var req  = ctx.Request;
             var resp = ctx.Response;
 
+            var serializer = NewJsonSerializer();
+            Request request = null;
+
+            resp.StatusCode = (int)HttpStatusCode.OK;
+            using (var ins = new JsonTextReader(new StreamReader(req.InputStream)))
+            {
+                try
+                {
+                    request = serializer.Deserialize<Request>(ins);
+                }
+                catch (JsonSerializationException e)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(e + "");
+                    resp.StatusCode = (int)HttpStatusCode.BadRequest;
+                    resp.ContentLength64 = buffer.Length;
+                    resp.OutputStream.Write(buffer, 0, buffer.Length);
+                } // ignore, bad request
+            }
+
             var db = host.Database;
 
             var configOpt = new ConfigOpt(this.host.CustomConfig);
 
-            if (configOpt.UnlockDatabaseRequest && !db.IsOpen)
+            if ((configOpt.UnlockDatabaseRequest || request.TriggerUnlock == "true") && !db.IsOpen)
             {
                 host.MainWindow.Invoke((MethodInvoker)delegate
                 {
@@ -331,24 +350,6 @@ namespace KeePassHttp
 
             if (db.IsOpen)
             {
-                var serializer = NewJsonSerializer();
-                Request request = null;
-
-                resp.StatusCode = (int)HttpStatusCode.OK;
-                using (var ins = new JsonTextReader(new StreamReader(req.InputStream))) {
-                    try
-                    {
-                        request = serializer.Deserialize<Request>(ins);
-                    }
-                    catch (JsonSerializationException e) {
-                        var buffer = Encoding.UTF8.GetBytes(e + "");
-                        resp.StatusCode = (int)HttpStatusCode.BadRequest;
-                        resp.ContentLength64 = buffer.Length;
-                        resp.OutputStream.Write(buffer, 0, buffer.Length);
-                    } // ignore, bad request
-                }
-
-
                 Response response = null;
                 if (request != null)
                     response = ProcessRequest(request, resp);

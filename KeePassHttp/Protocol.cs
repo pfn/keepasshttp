@@ -75,6 +75,11 @@ namespace KeePassHttp
         public string SortSelection;
 
         /// <summary>
+        /// Trigger unlock of database even if feature is disabled in KPH (because of user interaction to fill-in)
+        /// </summary>
+        public string TriggerUnlock;
+
+        /// <summary>
         /// Always encrypted, used with set-login, uuid is set
         /// if modifying an existing login
         /// </summary>
