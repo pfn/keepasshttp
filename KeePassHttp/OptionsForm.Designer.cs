@@ -50,16 +50,21 @@
             this.label1 = new System.Windows.Forms.Label();
             this.credAllowUpdatesCheckbox = new System.Windows.Forms.CheckBox();
             this.credAllowAccessCheckbox = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.portNumber = new System.Windows.Forms.NumericUpDown();
+            this.label7 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.portNumber)).BeginInit();
             this.SuspendLayout();
             // 
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(313, 295);
+            this.cancelButton.Location = new System.Drawing.Point(313, 383);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(88, 28);
             this.cancelButton.TabIndex = 2;
@@ -71,7 +76,7 @@
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.okButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.okButton.Location = new System.Drawing.Point(219, 295);
+            this.okButton.Location = new System.Drawing.Point(219, 383);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(88, 28);
             this.okButton.TabIndex = 1;
@@ -89,7 +94,7 @@
             this.tabControl1.Location = new System.Drawing.Point(1, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(410, 285);
+            this.tabControl1.Size = new System.Drawing.Size(410, 373);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -105,7 +110,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(402, 259);
+            this.tabPage1.Size = new System.Drawing.Size(402, 347);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -201,6 +206,10 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label7);
+            this.tabPage2.Controls.Add(this.portNumber);
+            this.tabPage2.Controls.Add(this.label5);
+            this.tabPage2.Controls.Add(this.label6);
             this.tabPage2.Controls.Add(this.label4);
             this.tabPage2.Controls.Add(this.label3);
             this.tabPage2.Controls.Add(this.returnStringFieldsCheckbox);
@@ -212,7 +221,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(402, 259);
+            this.tabPage2.Size = new System.Drawing.Size(402, 347);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Advanced";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -296,13 +305,64 @@
             this.credAllowAccessCheckbox.Text = "Always allow &access to entries";
             this.credAllowAccessCheckbox.UseVisualStyleBackColor = true;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(21, 298);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(29, 13);
+            this.label6.TabIndex = 26;
+            this.label6.Text = "Port:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 274);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(312, 13);
+            this.label5.TabIndex = 27;
+            this.label5.Text = "Change the default port number if you have connection problems";
+            // 
+            // portNumber
+            // 
+            this.portNumber.Location = new System.Drawing.Point(56, 296);
+            this.portNumber.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.portNumber.Minimum = new decimal(new int[] {
+            1025,
+            0,
+            0,
+            0});
+            this.portNumber.Name = "portNumber";
+            this.portNumber.Size = new System.Drawing.Size(60, 20);
+            this.portNumber.TabIndex = 29;
+            this.portNumber.Value = new decimal(new int[] {
+            19455,
+            0,
+            0,
+            0});
+            this.portNumber.ValueChanged += new System.EventHandler(this.portNumber_ValueChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(132, 296);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(241, 39);
+            this.label7.TabIndex = 30;
+            this.label7.Text = "Default: 19455\r\nDon\'t forget to change the port number also in\r\nthe plugins like " +
+    "chromeIPass, PassIFox, kypass,...";
+            // 
             // OptionsForm
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(411, 332);
+            this.ClientSize = new System.Drawing.Size(411, 420);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
@@ -318,6 +378,7 @@
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.portNumber)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -345,5 +406,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.RadioButton SortByUsernameRadioButton;
         private System.Windows.Forms.RadioButton SortByTitleRadioButton;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown portNumber;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
     }
 }

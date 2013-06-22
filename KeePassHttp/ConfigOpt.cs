@@ -14,6 +14,7 @@ namespace KeePassHttp
         const string MatchSchemesKey = "KeePassHttp_MatchSchemes";
         const string ReturnStringFieldsKey = "KeePassHttp_ReturnStringFields";
         const string SortResultByUsernameKey = "KeePassHttp_SortResultByUsername";
+        const string ListenerPortKey = "KeePassHttp_ListenerPort";
 
         public ConfigOpt(AceCustomConfig config)
         {
@@ -72,6 +73,12 @@ namespace KeePassHttp
         {
             get { return _config.GetBool(SortResultByUsernameKey, true); }
             set { _config.SetBool(SortResultByUsernameKey, value); }
+        }
+
+        public long ListenerPort
+        {
+            get { return _config.GetLong(ListenerPortKey, KeePassHttpExt.DEFAULT_PORT); }
+            set { _config.SetLong(ListenerPortKey, value); }
         }
     }
 }

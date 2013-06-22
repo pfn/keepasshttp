@@ -42,7 +42,7 @@ namespace KeePassHttp
         public const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
         private IPluginHost host;
         private HttpListener listener;
-        private const int DEFAULT_PORT = 19455;
+        public const int DEFAULT_PORT = 19455;
         /// <summary>
         /// TODO make configurable
         /// </summary>
@@ -196,7 +196,10 @@ namespace KeePassHttp
                     handlers.Add(Request.GENERATE_PASSWORD, GeneratePassword);
 
                     listener = new HttpListener();
-                    listener.Prefixes.Add(HTTP_PREFIX + port + "/");
+
+                    var configOpt = new ConfigOpt(this.host.CustomConfig);
+
+                    listener.Prefixes.Add(HTTP_PREFIX + configOpt.ListenerPort.ToString() + "/");
                     //listener.Prefixes.Add(HTTPS_PREFIX + HTTPS_PORT + "/");
                     listener.Start();
 

@@ -15,6 +15,7 @@ namespace KeePassHttp
     public partial class OptionsForm : Form
     {
         readonly ConfigOpt _config;
+        private bool _restartRequired = false;
 
         public OptionsForm(ConfigOpt config)
         {
@@ -44,6 +45,7 @@ namespace KeePassHttp
             returnStringFieldsCheckbox.Checked = _config.ReturnStringFields;
             SortByUsernameRadioButton.Checked = _config.SortResultByUsername;
             SortByTitleRadioButton.Checked = !_config.SortResultByUsername;
+            portNumber.Value = _config.ListenerPort;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -57,6 +59,17 @@ namespace KeePassHttp
             _config.MatchSchemes = matchSchemesCheckbox.Checked;
             _config.ReturnStringFields = returnStringFieldsCheckbox.Checked;
             _config.SortResultByUsername = SortByUsernameRadioButton.Checked;
+            _config.ListenerPort = (int)portNumber.Value;
+
+            if (_restartRequired)
+            {
+                MessageBox.Show(
+                    "You have successfully changed the port number.\nA restart of KeePass is required!\n\nPlease restart KeePass now.",
+                    "Restart required!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
         }
 
         private void removeButton_Click(object sender, EventArgs e)
@@ -181,6 +194,11 @@ namespace KeePassHttp
             {
                 MessageBox.Show("The active database is locked!\nPlease unlock the selected database or choose another one which is unlocked.", "Database locked!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void portNumber_ValueChanged(object sender, EventArgs e)
+        {
+            _restartRequired = (_config.ListenerPort != portNumber.Value);
         }
     }
 }
