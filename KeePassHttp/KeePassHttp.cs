@@ -333,7 +333,7 @@ namespace KeePassHttp
 
             var configOpt = new ConfigOpt(this.host.CustomConfig);
 
-            if ((configOpt.UnlockDatabaseRequest || request.TriggerUnlock == "true") && !db.IsOpen)
+            if (request != null && (configOpt.UnlockDatabaseRequest || request.TriggerUnlock == "true") && !db.IsOpen)
             {
                 host.MainWindow.Invoke((MethodInvoker)delegate
                 {
@@ -351,7 +351,7 @@ namespace KeePassHttp
                 }
             }
 
-            if (db.IsOpen)
+            if (request != null && db.IsOpen)
             {
                 Response response = null;
                 if (request != null)
