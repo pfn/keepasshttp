@@ -17,6 +17,7 @@ using Microsoft.Win32;
 using KeePass.UI;
 using KeePass;
 using KeePassLib.Cryptography.PasswordGenerator;
+using KeePassLib.Cryptography;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin
@@ -633,7 +634,8 @@ namespace KeePassHttp {
             byte[] pbNew = psNew.ReadUtf8();
             if (pbNew != null)
             {
-                ResponseEntry item = new ResponseEntry(Request.GENERATE_PASSWORD, Request.GENERATE_PASSWORD, StrUtil.Utf8.GetString(pbNew), Request.GENERATE_PASSWORD, null);
+                uint uBits = QualityEstimation.EstimatePasswordBits(pbNew);
+                ResponseEntry item = new ResponseEntry(Request.GENERATE_PASSWORD, uBits.ToString(), StrUtil.Utf8.GetString(pbNew), Request.GENERATE_PASSWORD, null);
                 resp.Entries.Add(item);
                 resp.Success = true;
                 resp.Count = 1;
