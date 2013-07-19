@@ -55,7 +55,7 @@ namespace KeePassHttp
         Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
 
         //public string UpdateUrl = "";
-        public override string UpdateUrl { get { return "https://raw.github.com/pfn/keepasshttp/master/update-version.txt"; } }
+        public override string UpdateUrl { get { return "https://passifox.appspot.com/kph/latest-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
