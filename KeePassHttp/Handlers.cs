@@ -403,14 +403,11 @@ namespace KeePassHttp {
 
                 if (configOpt.SpecificMatchingOnly)
                 {
-                    ulong highestCount = 0;
+                    itemsList = (from e in itemsList orderby e.entry.UsageCount descending select e).ToList();
+
+                    ulong highestCount = itemsList[0].entry.UsageCount;
                     foreach (var entryDatabase in itemsList.ToList())
                     {
-                        if (highestCount == 0)
-                        {
-                            highestCount = entryDatabase.entry.UsageCount;
-                        }
-
                         if (entryDatabase.entry.UsageCount != highestCount)
                         {
                             itemsList.Remove(entryDatabase);
