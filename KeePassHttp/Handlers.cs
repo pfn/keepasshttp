@@ -327,8 +327,10 @@ namespace KeePassHttp {
                         sortHost = sortHost.Substring(0, sortHost.Length - 1);
 
                     string sortSubmiturl = null;
-                    if(r.SubmitUrl != null)
-                        sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                    string fullSubmitUrl = null;
+                    if(r.SubmitUrl != null) {
+                        sortSubmiturl = fullSubmitUrl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                    }
                     if (sortSubmiturl == null)
                         sortSubmiturl = String.Copy(sortHost);
                     if (sortSubmiturl.EndsWith("/"))
@@ -403,16 +405,19 @@ namespace KeePassHttp {
 
                 if (configOpt.SpecificMatchingOnly)
                 {
-                    itemsList = (from e in itemsList orderby e.entry.UsageCount descending select e).ToList();
+                    itemsList = (from e in itemsList orderby LevenshteinDistance(fullSubmitUrl, e.entry.Strings.ReadSafe(PwDefs.UrlField)) ascending select e).ToList();
 
-                    ulong highestCount = itemsList[0].entry.UsageCount;
-                    foreach (var entryDatabase in itemsList.ToList())
-                    {
-                        if (entryDatabase.entry.UsageCount != highestCount)
-                        {
-                            itemsList.Remove(entryDatabase);
-                        }
-                    }
+                    //foreach()
+                    itemsList = itemsList.GetRange(0, 1);
+
+                    //ulong highestCount = itemsList[0].entry.UsageCount;
+                    //foreach (var entryDatabase in itemsList.ToList())
+                    //{
+                    //    if (entryDatabase.entry.UsageCount != highestCount)
+                    //    {
+                    //        itemsList.Remove(entryDatabase);
+                    //    }
+                    //}
                 }
 
                 if (configOpt.SortResultByUsername)
@@ -470,6 +475,46 @@ namespace KeePassHttp {
                 resp.Id = r.Id;
                 SetResponseVerifier(resp, aes);
             }
+        }
+        //http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.23
+        private int LevenshteinDistance(string source, string target)
+        {
+            if (String.IsNullOrEmpty(source))
+            {
+                if (String.IsNullOrEmpty(target)) return 0;
+                return target.Length;
+            }
+            if (String.IsNullOrEmpty(target)) return source.Length;
+
+            if (source.Length > target.Length)
+            {
+                var temp = target;
+                target = source;
+                source = temp;
+            }
+
+            var m = target.Length;
+            var n = source.Length;
+            var distance = new int[2, m + 1];
+            // Initialize the distance 'matrix'
+            for (var j = 1; j <= m; j++) distance[0, j] = j;
+
+            var currentRow = 0;
+            for (var i = 1; i <= n; ++i)
+            {
+                currentRow = i & 1;
+                distance[currentRow, 0] = i;
+                var previousRow = currentRow ^ 1;
+                for (var j = 1; j <= m; j++)
+                {
+                    var cost = (target[j - 1] == source[i - 1] ? 0 : 1);
+                    distance[currentRow, j] = Math.Min(Math.Min(
+                                            distance[previousRow, j] + 1,
+                                            distance[currentRow, j - 1] + 1),
+                                            distance[previousRow, j - 1] + cost);
+                }
+            }
+            return distance[currentRow, m];
         }
 
         private ResponseEntry PrepareElementForResponseEntries(ConfigOpt configOpt, PwEntryDatabase entryDatabase)
