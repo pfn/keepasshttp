@@ -142,35 +142,23 @@ If you _really_ have only one copy of KeePassHttp in your KeePass directory anot
 
 KeePassHttp can receive 2 different URLs, called URL and SubmitURL.
 
-1. The host of the URL is extracted (http://www.example.org --> www.example.org)
-2. All entries in the database are searched for this host:
-  - searched fields: title + URL
-  - matching result will be: at least of the searched fields contain the host ("http://www.example.org/index.html" contains "www.example.org")
-  - if no entry was found, the host is cropped from beginning to the next point and the search restarts (www.example.org --> example.org --> org).
-3. Now all found entries are filtered for one of the following points:
-  - title-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
-  - URL-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
-  - host of (1) contains the whole content of the title-field or the URL-field
-4. If the request passed the flag _SortSelection_ the filtered entries are sorted by best matching URL:
-  - entryURL from URL-field of an entry is prepared
-     - ending slash will be removed
-     - missing scheme in front of entryURL will add "http://" to the beginning of entryURL
-  - baseSubmitURL is the submitURL without ending filename and arguments (http://www.example.org/index.php?arg=1 --> http://www.example.org)
-  - baseEntryURL is the entryURL without ending filename and arguments
-  - sort order by highest matching:
-     1. submitURL == entryURL
-     2. submitURL starts with entryURL and entryURL != host (1) and baseSubmitURL != entryURL
-     3. submitURL starts with baseEntryURL and entryURL != host (1) and baseSubmitURL != baseEntryURL
-     4. entryURL == host (1)
-     5. entryURL == baseSubmitURL
-     6. entryURL starts with submitURL
-     7. entryURL starts with baseSubmitURL and baseSubmitURL != host (1)
-     8. submitURL starts with entryURL
-     9. submitURL starts with baseEntryURL
-     10. entryURL starts with host (1)
-     11. host (1) starts with entryURL
-     12. otherwise last position in list
-5. If the setting for best matching entries is activated only the entries with the highest matching of step 4 will be returned.
+CompareToUrl = SubmitURL if set, URL otherwise
+
+For every entry, the [Levenshtein Distance](http://en.wikipedia.org/wiki/Levenshtein_distance) of his Entry-URL (or Title, if Entry-URL is not set) to the CompareToURL is calculated.
+
+Only the Entries with the minimal distance are returned.
+
+###Example:
+Submit-Url: http://www.host.com/subdomain1/login
+
+Entry-URL|Distance
+---|---
+http://www.host.com/|16
+http://www.host.com/subdomain1|6
+http://www.host.com/subdomain2|7
+
+-> second entry is returned
+
  
 ## Security
 
