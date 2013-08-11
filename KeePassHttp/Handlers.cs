@@ -336,6 +336,8 @@ namespace KeePassHttp {
                     if (String.IsNullOrEmpty(entryUrl))
                         entryUrl = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
 
+                    entryUrl = entryUrl.ToLower();
+
                     entryDatabase.entry.UsageCount = (ulong)LevenshteinDistance(compareToUrl, entryUrl);
 
                 }
