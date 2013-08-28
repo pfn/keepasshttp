@@ -157,7 +157,7 @@ http://www.host.com/|16
 http://www.host.com/subdomain1|6
 http://www.host.com/subdomain2|7
 
--> second entry is returned
+__Result:__ second entry is returned
 
  
 ## Security
