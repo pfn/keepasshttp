@@ -233,5 +233,10 @@ namespace KeePassHttp
                 _config.ListenerHostHttps != listenerHostHttps.Text
             );
         }
+
+        private void instructionsLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Link.LinkData as string);
+        }
     }
 }
