@@ -45,7 +45,15 @@ namespace KeePassHttp
             returnStringFieldsCheckbox.Checked = _config.ReturnStringFields;
             SortByUsernameRadioButton.Checked = _config.SortResultByUsername;
             SortByTitleRadioButton.Checked = !_config.SortResultByUsername;
-            portNumber.Value = _config.ListenerPort;
+            listenerHostHttp.Text = _config.ListenerHostHttp;
+            portNumberHttp.Value = _config.ListenerPortHttp;
+            activateHttpsListenerCheckbox.Checked = _config.ActivateHttpsListener;
+            listenerHostHttps.Text = _config.ListenerHostHttps;
+            portNumberHttps.Value = _config.ListenerPortHttps;
+            
+            LinkLabel.Link link = new LinkLabel.Link();
+            link.LinkData = "https://github.com/mheese/keepasshttp/wiki/Listener-Configuration";
+            instructionsLink.Links.Add(link);
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -59,12 +67,16 @@ namespace KeePassHttp
             _config.MatchSchemes = matchSchemesCheckbox.Checked;
             _config.ReturnStringFields = returnStringFieldsCheckbox.Checked;
             _config.SortResultByUsername = SortByUsernameRadioButton.Checked;
-            _config.ListenerPort = (int)portNumber.Value;
+            _config.ListenerHostHttp = listenerHostHttp.Text;
+            _config.ListenerPortHttp = (int)portNumberHttp.Value;
+            _config.ActivateHttpsListener = activateHttpsListenerCheckbox.Checked;
+            _config.ListenerHostHttps = listenerHostHttps.Text;
+            _config.ListenerPortHttps = (int)portNumberHttps.Value;
 
             if (_restartRequired)
             {
                 MessageBox.Show(
-                    "You have successfully changed the port number.\nA restart of KeePass is required!\n\nPlease restart KeePass now.",
+                    "You have successfully changed the port number or changed the host binding.\nA restart of KeePass is required!\n\nPlease restart KeePass now.",
                     "Restart required!",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
@@ -198,7 +210,28 @@ namespace KeePassHttp
 
         private void portNumber_ValueChanged(object sender, EventArgs e)
         {
-            _restartRequired = (_config.ListenerPort != portNumber.Value);
+            checkRestartRequired(); 
+        }
+
+        private void listenerHost_TextChanged(object sender, EventArgs e)
+        {
+            checkRestartRequired(); 
+        }
+
+        private void activateHttpsListenerCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            checkRestartRequired(); 
+        }
+
+        private void checkRestartRequired()
+        {
+            _restartRequired = (
+                _config.ListenerPortHttp != portNumberHttp.Value ||
+                _config.ListenerHostHttp != listenerHostHttp.Text ||
+                _config.ActivateHttpsListener != activateHttpsListenerCheckbox.Checked ||
+                _config.ListenerPortHttps != portNumberHttps.Value ||
+                _config.ListenerHostHttps != listenerHostHttps.Text
+            );
         }
     }
 }

@@ -14,7 +14,11 @@ namespace KeePassHttp
         const string MatchSchemesKey = "KeePassHttp_MatchSchemes";
         const string ReturnStringFieldsKey = "KeePassHttp_ReturnStringFields";
         const string SortResultByUsernameKey = "KeePassHttp_SortResultByUsername";
-        const string ListenerPortKey = "KeePassHttp_ListenerPort";
+        const string ListenerHostHttpKey = "KeePassHttp_ListenerHostHttp";
+        const string ListenerPortHttpKey = "KeePassHttp_ListenerPortHttp";
+        const string ActivateHttpsListenerKey = "KeePassHttp_ActivateHttpsListener";
+        const string ListenerHostHttpsKey = "KeePassHttp_ListenerHostHttps";
+        const string ListenerPortHttpsKey = "KeePassHttp_ListenerPortHttps";
 
         public ConfigOpt(AceCustomConfig config)
         {
@@ -75,10 +79,33 @@ namespace KeePassHttp
             set { _config.SetBool(SortResultByUsernameKey, value); }
         }
 
-        public long ListenerPort
+        public string ListenerHostHttp {
+            get { return _config.GetString(ListenerHostHttpKey, KeePassHttpExt.DEFAULT_HOST); }
+            set { _config.SetString(ListenerHostHttpKey, value); }
+        }
+        
+        public long ListenerPortHttp
         {
-            get { return _config.GetLong(ListenerPortKey, KeePassHttpExt.DEFAULT_PORT); }
-            set { _config.SetLong(ListenerPortKey, value); }
+            get { return _config.GetLong(ListenerPortHttpKey, KeePassHttpExt.DEFAULT_PORT_HTTP); }
+            set { _config.SetLong(ListenerPortHttpKey, value); }
+        }
+
+        public bool ActivateHttpsListener
+        {
+            get { return _config.GetBool(ActivateHttpsListenerKey, false); }
+            set { _config.SetBool(ActivateHttpsListenerKey, value); }
+        }
+
+        public string ListenerHostHttps
+        {
+            get { return _config.GetString(ListenerHostHttpsKey, KeePassHttpExt.DEFAULT_HOST); }
+            set { _config.SetString(ListenerHostHttpsKey, value); }
+        }
+
+        public long ListenerPortHttps
+        {
+            get { return _config.GetLong(ListenerPortHttpsKey, KeePassHttpExt.DEFAULT_PORT_HTTPS); }
+            set { _config.SetLong(ListenerPortHttpsKey, value); }
         }
     }
 }

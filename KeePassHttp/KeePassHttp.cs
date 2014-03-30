@@ -42,20 +42,17 @@ namespace KeePassHttp
         public const string ASSOCIATE_KEY_PREFIX = "AES Key: ";
         private IPluginHost host;
         private HttpListener listener;
-        public const int DEFAULT_PORT = 19455;
-        /// <summary>
-        /// TODO make configurable
-        /// </summary>
-        private int port = DEFAULT_PORT;
-        private const string HTTP_PREFIX = "http://localhost:";
-        //private const string HTTPS_PREFIX = "https://localhost:";
-        //private int HTTPS_PORT = DEFAULT_PORT + 1;
+        public const int DEFAULT_PORT_HTTP = 19455;
+        public const int DEFAULT_PORT_HTTPS = 19456;
+        public const string DEFAULT_HOST = "localhost";
+        private const string HTTP_PREFIX = "http://";
+        private const string HTTPS_PREFIX = "https://";
         private Thread httpThread;
         private volatile bool stopped = false;
         Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
 
         //public string UpdateUrl = "";
-        public override string UpdateUrl { get { return "https://passifox.appspot.com/kph/latest-version.txt"; } }
+        public override string UpdateUrl { get { return "https://raw.githubusercontent.com/mheese/keepasshttp/master/latest-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
@@ -198,9 +195,19 @@ namespace KeePassHttp
                     listener = new HttpListener();
 
                     var configOpt = new ConfigOpt(this.host.CustomConfig);
-
-                    listener.Prefixes.Add(HTTP_PREFIX + configOpt.ListenerPort.ToString() + "/");
-                    //listener.Prefixes.Add(HTTPS_PREFIX + HTTPS_PORT + "/");
+                    listener.Prefixes.Add(HTTP_PREFIX + configOpt.ListenerHostHttp + ":" + configOpt.ListenerPortHttp.ToString() + "/");
+                    if (configOpt.ListenerHostHttp != DEFAULT_HOST)
+                    {
+                        listener.Prefixes.Add(HTTP_PREFIX + DEFAULT_HOST + ":" + configOpt.ListenerPortHttp.ToString() + "/");
+                    }
+                    if (configOpt.ActivateHttpsListener)
+                    {
+                        listener.Prefixes.Add(HTTPS_PREFIX + configOpt.ListenerHostHttps + ":" + configOpt.ListenerPortHttps.ToString() + "/");
+                        if (configOpt.ListenerHostHttps != DEFAULT_HOST)
+                        {
+                            listener.Prefixes.Add(HTTPS_PREFIX + DEFAULT_HOST + ":" + configOpt.ListenerPortHttps.ToString() + "/");
+                        }
+                    }
                     listener.Start();
 
                     httpThread = new Thread(new ThreadStart(Run));
