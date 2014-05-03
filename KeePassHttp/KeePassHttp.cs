@@ -46,7 +46,6 @@ namespace KeePassHttp
         /// <summary>
         /// TODO make configurable
         /// </summary>
-        private int port = DEFAULT_PORT;
         private const string HTTP_PREFIX = "http://localhost:";
         //private const string HTTPS_PREFIX = "https://localhost:";
         //private int HTTPS_PORT = DEFAULT_PORT + 1;
@@ -55,7 +54,7 @@ namespace KeePassHttp
         Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
 
         //public string UpdateUrl = "";
-        public override string UpdateUrl { get { return "https://passifox.appspot.com/kph/latest-version.txt"; } }
+		public override string UpdateUrl { get { return "https://raw.githubusercontent.com/DarthCrap/keepasshttp/master/latest-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
@@ -190,6 +189,7 @@ namespace KeePassHttp
                     handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
                     handlers.Add(Request.ASSOCIATE, AssociateHandler);
                     handlers.Add(Request.GET_LOGINS, GetLoginsHandler);
+					handlers.Add(Request.GET_LOGINS_BY_NAMES, GetLoginsByNamesHandler);
                     handlers.Add(Request.GET_LOGINS_COUNT, GetLoginsCountHandler);
                     handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
                     handlers.Add(Request.SET_LOGIN, SetLoginHandler);
