@@ -30,7 +30,7 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and
 
 ### KeePassHttp on Linux and Mac
 
-KeePass needs Mono. You can find detailed [installation insructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
+KeePass needs Mono. You can find detailed [installation instructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
 
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 With Mono 2.6.7 and a version of KeePass lower than 2.20 he could not get the plgx file to work on linux.
