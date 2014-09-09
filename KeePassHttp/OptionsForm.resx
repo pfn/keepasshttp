@@ -124,4 +124,9 @@ normal "String Fields" are used, which can be defined in the
 String fields are returned in alphabetical order and have to start
 with "KPH: " (mind the space after KPH:).</value>
   </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>Specify a different port number if you have connection problems, and specify a
+different host name if you require access from a remote network. Then you
+probably also want to enable the HTTPS listener.</value>
+  </data>
 </root>

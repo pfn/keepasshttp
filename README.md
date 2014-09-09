@@ -1,9 +1,11 @@
 # KeePassHttp
 
-is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP for clients to
+is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP or HTTPS for clients to
 consume.
 
-This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and chromeIPass for Google Chrome](https://github.com/pfn/passifox/).
+This is a fork from [pfn/keepasshttp](https://github.com/pfn/keepasshttp). It is mainly intended to add remote access functionality to KeePassHttp. Have a look at the [Wiki section](https://github.com/mheese/keepasshttp/wiki/Listener-Configuration) on how to configure it! The rest is the same! Enjoy!
+
+This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and chromeIPass for Google Chrome](https://github.com/pfn/passifox/). However, the listener HTTPS feature only works with passIFox at the moment, as you cannot specify https in chromeIPass yet.
 
 ## Features
  * returns all matching entries for a given URL

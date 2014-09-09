@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("KeePassHttp")]
 [assembly: AssemblyDescription("A plugin to expose a secure HTTP interface to your KeePass database")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Perry Nguyen, Lukas Schulze")]
+[assembly: AssemblyCompany("Marcus Heese, Perry Nguyen, Lukas Schulze")]
 [assembly: AssemblyProduct("KeePass Plugin")]
-[assembly: AssemblyCopyright("Copyright © Perry Nguyen, Lukas Schulze 2013")]
+[assembly: AssemblyCopyright("Copyright © Marcus Heese, Perry Nguyen, Lukas Schulze 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.21.0.0")]
-[assembly: AssemblyFileVersion("1.8.3.0")]
+[assembly: AssemblyVersion("2.22.0.0")]
+[assembly: AssemblyFileVersion("1.9.0.1")]
