@@ -139,6 +139,8 @@ namespace KeePassHttp
             MethodInvoker m = delegate
             {
                 var notify = host.MainWindow.MainNotifyIcon;
+                if (notify == null)
+                    return;
 
                 EventHandler clicked = null;
                 EventHandler closed = null;
