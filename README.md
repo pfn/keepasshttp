@@ -57,8 +57,7 @@ mono v2.10.8:
 I have no problems using "KeePassHttp.plgx". I simply dropped the .plgx-file in my KeePass folder, and it works.
 
 I'm currently using KeePass v2.22.  
-Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it
-worked fine too.
+Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it worked fine too.
 
 Usually I only use chromeIPass, but I did a short test
 with PassIFox and seems to be working just fine.
@@ -73,7 +72,7 @@ KeePassHttp works out-of-the-box. You don't have to explicitely configure it.
 
 ### Settings in KeePassHttp options.
 
-You can open the options dialog with menu: Tools > KeePassHttp Options...
+You can open the options dialog with menu: Tools > KeePassHttp Options
 
 [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg" alt="menu" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg)
 
@@ -81,18 +80,23 @@ The options dialog will appear:
 
 [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png" alt="options-general" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png)
 
+General tab
+
 1. show a notification balloon whenever entries are delivered to the inquirer.
-2. returns only the best matching entries for the given url, otherwise all entries for a domain are send
+2. returns only the best matching entries for the given url, otherwise all entries for a domain are send.
   - e.g. of two entries with the URLs http://example.org and http://example.org/, only the second one will returned if the requested URL is http://example.org/index.html
 3. if the active database in KeePass is locked, KeePassHttp sends a request to unlock the database. Now KeePass opens and the user has to enter the master password to unlock the database. Otherwise KeePassHttp tells the inquirer that the database is closed.
-4. KeePassHttp returns only these entries which match the scheme of the given URL
+4. KeePassHttp returns only these entries which match the scheme of the given URL.
   - given URL: https://example.org --> scheme: https:// --> only entries whose URL starts with https://
-5. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
-6. removes all stored permissions in the entries of the currently selected database.
-7. Sort found entries by username or title  
-  .  
-  [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png" alt="options-advanced" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
-8. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
+5. sort found entries by username or title.
+6. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
+7. removes all stored permissions in the entries of the currently selected database.
+
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png" alt="options-advanced" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
+
+Advanced tab
+
+8. KeePassHttp no longer asks for permissions to retrieve entries, it always allows access.
 9. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
 10. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
