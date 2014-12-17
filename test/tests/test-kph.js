@@ -147,3 +147,26 @@ test(function get_logins_match_url_urltitle_mismatch2() {
     assert_equals(1, response.Entries.length);
     assert_equals("bogustest1-user", decrypt(response.Entries[0].Login, response.Nonce));
 });
+
+test(function get_logins_subpath() {
+    var resp;
+    get_logins("http://www.host.com", "http://www.host.com/path1", null, function(r) {
+        resp = r;
+        lock.notify();
+    });
+    lock.wait();
+    var response = JSON.parse(resp);
+    assert_equals(1, response.Entries.length);
+    assert_equals("user1", decrypt(response.Entries[0].Login, response.Nonce));
+});
+test(function get_logins_subpath_2() {
+    var resp;
+    get_logins("http://www.host.com", "http://www.host.com/path2?param=value", null, function(r) {
+        resp = r;
+        lock.notify();
+    });
+    lock.wait();
+    var response = JSON.parse(resp);
+    assert_equals(1, response.Entries.length);
+    assert_equals("user2", decrypt(response.Entries[0].Login, response.Nonce));
+});
