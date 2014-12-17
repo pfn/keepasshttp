@@ -3,7 +3,7 @@
 is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
 
-This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and chromeIPass for Google Chrome](https://github.com/pfn/passifox/).
+This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](https://github.com/pfn/passifox/) and [chromeIPass for Google Chrome](https://chrome.google.com/webstore/detail/chromeipass/ompiailgknfdndiefoaoiligalphfdae?hl=en).
 
 ## Features
  * returns all matching entries for a given URL
