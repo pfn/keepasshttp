@@ -25,6 +25,7 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](ht
 ## Installation
  1. Download [KeePassHttp](https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx)
  2. Copy it into the KeePass directory
+	* default directory in Ubuntu14.04: /usr/lib/keepass2/
  3. On linux systems you maybe need to install mono-complete: `$ apt-get install mono-complete` (in Debian it should be enough to install the packages libmono-system-runtime-serialization4.0-cil and libmono-posix2.0-cil)
  4. Restart KeePass
 
