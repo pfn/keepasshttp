@@ -46,6 +46,7 @@ namespace KeePassHttp
             SortByUsernameRadioButton.Checked = _config.SortResultByUsername;
             SortByTitleRadioButton.Checked = !_config.SortResultByUsername;
             portNumber.Value = _config.ListenerPort;
+            hostName.Text = _config.ListenerHost;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -60,11 +61,11 @@ namespace KeePassHttp
             _config.ReturnStringFields = returnStringFieldsCheckbox.Checked;
             _config.SortResultByUsername = SortByUsernameRadioButton.Checked;
             _config.ListenerPort = (int)portNumber.Value;
-
+            _config.ListenerHost = hostName.Text;
             if (_restartRequired)
             {
                 MessageBox.Show(
-                    "You have successfully changed the port number.\nA restart of KeePass is required!\n\nPlease restart KeePass now.",
+                    "You have successfully changed the port number and/or the host name.\nA restart of KeePass is required!\n\nPlease restart KeePass now.",
                     "Restart required!",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
@@ -91,7 +92,7 @@ namespace KeePassHttp
                     }
 
 
-                    if(deleteKeys.Count > 0)
+                    if (deleteKeys.Count > 0)
                     {
                         PwObjectList<PwEntry> m_vHistory = entry.History.CloneDeep();
                         entry.History = m_vHistory;
@@ -150,7 +151,8 @@ namespace KeePassHttp
                     );
                 }
 
-                foreach (var entry in entries) {
+                foreach (var entry in entries)
+                {
                     foreach (var str in entry.Strings)
                     {
                         if (str.Key == KeePassHttpExt.KEEPASSHTTP_NAME)
@@ -198,7 +200,17 @@ namespace KeePassHttp
 
         private void portNumber_ValueChanged(object sender, EventArgs e)
         {
-            _restartRequired = (_config.ListenerPort != portNumber.Value);
+            SetRestartRequired();
+        }
+
+        private void hostName_TextChanged(object sender, EventArgs e)
+        {
+            SetRestartRequired();
+        }
+
+        private void SetRestartRequired()
+        {
+            _restartRequired = (_config.ListenerPort != portNumber.Value) || (_config.ListenerHost != hostName.Text);
         }
     }
 }
