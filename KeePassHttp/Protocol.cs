@@ -61,7 +61,7 @@ namespace KeePassHttp
     {
         public const string GET_LOGINS = "get-logins";
         public const string GET_LOGINS_COUNT = "get-logins-count";
-		public const string GET_LOGINS_BY_NAMES = "get-logins-by-names";
+        public const string GET_LOGINS_BY_NAMES = "get-logins-by-names";
         public const string GET_ALL_LOGINS = "get-all-logins";
         public const string SET_LOGIN = "set-login";
         public const string ASSOCIATE = "associate";
@@ -93,10 +93,10 @@ namespace KeePassHttp
         /// </summary>
         public string Url;
 
-		/// <summary>
-		/// Always encrypted, used get-logins-by-names
-		/// </summary>
-		public List<string> Names;
+        /// <summary>
+        /// Always encrypted, used get-logins-by-names
+        /// </summary>
+        public List<string> Names;
 
         /// <summary>
         /// Always encrypted, used with get-login
