@@ -43,10 +43,11 @@ namespace KeePassHttp
         private IPluginHost host;
         private HttpListener listener;
         public const int DEFAULT_PORT = 19455;
+        public const string DEFAULT_HOST = "localhost";
         /// <summary>
         /// TODO make configurable
         /// </summary>
-        private const string HTTP_PREFIX = "http://localhost:";
+        private const string HTTP_SCHEME = "http://";
         //private const string HTTPS_PREFIX = "https://localhost:";
         //private int HTTPS_PORT = DEFAULT_PORT + 1;
         private Thread httpThread;
@@ -54,7 +55,7 @@ namespace KeePassHttp
         Dictionary<string, RequestHandler> handlers = new Dictionary<string, RequestHandler>();
 
         //public string UpdateUrl = "";
-		public override string UpdateUrl { get { return "https://raw.githubusercontent.com/DarthCrap/keepasshttp/master/latest-version.txt"; } }
+        public override string UpdateUrl { get { return "https://passifox.appspot.com/kph/latest-version.txt"; } }
 
         private SearchParameters MakeSearchParameters()
         {
@@ -138,6 +139,8 @@ namespace KeePassHttp
             MethodInvoker m = delegate
             {
                 var notify = host.MainWindow.MainNotifyIcon;
+                if (notify == null)
+                    return;
 
                 EventHandler clicked = null;
                 EventHandler closed = null;
@@ -199,7 +202,7 @@ namespace KeePassHttp
 
                     var configOpt = new ConfigOpt(this.host.CustomConfig);
 
-                    listener.Prefixes.Add(HTTP_PREFIX + configOpt.ListenerPort.ToString() + "/");
+                    listener.Prefixes.Add(HTTP_SCHEME + configOpt.ListenerHost + ":" + configOpt.ListenerPort.ToString() + "/");
                     //listener.Prefixes.Add(HTTPS_PREFIX + HTTPS_PORT + "/");
                     listener.Start();
 

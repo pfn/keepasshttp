@@ -3,7 +3,7 @@
 is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP for clients to
 consume.
 
-This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and chromeIPass for Google Chrome](https://github.com/pfn/passifox/).
+This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](https://github.com/pfn/passifox/) and [chromeIPass for Google Chrome](https://chrome.google.com/webstore/detail/chromeipass/ompiailgknfdndiefoaoiligalphfdae?hl=en).
 
 ## Features
  * returns all matching entries for a given URL
@@ -22,15 +22,23 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox and
  * For Linux: installed mono
  * For Mac: installed mono | it seems to fully support KeePassHttp, but we cannot test it
 
-## Installation
+## Windows installation using Chocolatey
+
+ 1. Install using [Chocolatey](https://chocolatey.org/) with `choco install keepass-keepasshttp`
+ 2. Restart KeePass if it is currently running to load the plugin
+
+## Non-Windows / Manual Windows installation
+
  1. Download [KeePassHttp](https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx)
  2. Copy it into the KeePass directory
- 3. On linux systems you maybe need to install mono-complete: `$ apt-get install mono-complete`
- 4. Restart KeePass
+	* default directory in Ubuntu14.04: /usr/lib/keepass2/
+ 3. Set chmod 644 on file `KeePassHttp.plgx`
+ 4. On linux systems you maybe need to install mono-complete: `$ apt-get install mono-complete` (in Debian it should be enough to install the packages libmono-system-runtime-serialization4.0-cil and libmono-posix2.0-cil)
+ 5. Restart KeePass
 
 ### KeePassHttp on Linux and Mac
 
-KeePass needs Mono. You can find detailed [installation insructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
+KeePass needs Mono. You can find detailed [installation instructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
 
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 With Mono 2.6.7 and a version of KeePass lower than 2.20 he could not get the plgx file to work on linux.
@@ -57,8 +65,7 @@ mono v2.10.8:
 I have no problems using "KeePassHttp.plgx". I simply dropped the .plgx-file in my KeePass folder, and it works.
 
 I'm currently using KeePass v2.22.  
-Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it
-worked fine too.
+Nevertheless, until KeePass v2.21 I used the 2 suggested .dll's and it worked fine too.
 
 Usually I only use chromeIPass, but I did a short test
 with PassIFox and seems to be working just fine.
@@ -73,7 +80,7 @@ KeePassHttp works out-of-the-box. You don't have to explicitely configure it.
 
 ### Settings in KeePassHttp options.
 
-You can open the options dialog with menu: Tools > KeePassHttp Options...
+You can open the options dialog with menu: Tools > KeePassHttp Options
 
 [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg" alt="menu" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/menu.jpg)
 
@@ -81,18 +88,23 @@ The options dialog will appear:
 
 [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png" alt="options-general" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-general.png)
 
+General tab
+
 1. show a notification balloon whenever entries are delivered to the inquirer.
-2. returns only the best matching entries for the given url, otherwise all entries for a domain are send
+2. returns only the best matching entries for the given url, otherwise all entries for a domain are send.
   - e.g. of two entries with the URLs http://example.org and http://example.org/, only the second one will returned if the requested URL is http://example.org/index.html
 3. if the active database in KeePass is locked, KeePassHttp sends a request to unlock the database. Now KeePass opens and the user has to enter the master password to unlock the database. Otherwise KeePassHttp tells the inquirer that the database is closed.
-4. KeePassHttp returns only these entries which match the scheme of the given URL
+4. KeePassHttp returns only these entries which match the scheme of the given URL.
   - given URL: https://example.org --> scheme: https:// --> only entries whose URL starts with https://
-5. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
-6. removes all stored permissions in the entries of the currently selected database.
-7. Sort found entries by username or title  
-  .  
-  [<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png" alt="options-advanced" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
-8. KeePassHttp no longer asks for permissions to retrieve entries, it always allows the access.
+5. sort found entries by username or title.
+6. removes all shared encryption-keys which are stored in the currently selected database. Every inquirer has to reauthenticate.
+7. removes all stored permissions in the entries of the currently selected database.
+
+[<img src="https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png" alt="options-advanced" width="300px" />](https://raw.github.com/pfn/keepasshttp/master/documentation/images/options-advanced.png)
+
+Advanced tab
+
+8. KeePassHttp no longer asks for permissions to retrieve entries, it always allows access.
 9. KeePassHttp no longer asks for permission to update an entry, it always allows updating them.
 10. Searching for entries is no longer restricted to the current active database in KeePass but is extended to all opened databases!
   - __Important:__ Even if another database is not connected with the inquirer, KeePassHttp will search and retrieve entries of all opened databases if the active one is connected to KeePassHttp!
@@ -142,35 +154,23 @@ If you _really_ have only one copy of KeePassHttp in your KeePass directory anot
 
 KeePassHttp can receive 2 different URLs, called URL and SubmitURL.
 
-1. The host of the URL is extracted (http://www.example.org --> www.example.org)
-2. All entries in the database are searched for this host:
-  - searched fields: title + URL
-  - matching result will be: at least of the searched fields contain the host ("http://www.example.org/index.html" contains "www.example.org")
-  - if no entry was found, the host is cropped from beginning to the next point and the search restarts (www.example.org --> example.org --> org).
-3. Now all found entries are filtered for one of the following points:
-  - title-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
-  - URL-field starts with http://, https://, ftp:// or sftp:// and the parsed hostname of the title-field is contained in the host of (1)
-  - host of (1) contains the whole content of the title-field or the URL-field
-4. If the request passed the flag _SortSelection_ the filtered entries are sorted by best matching URL:
-  - entryURL from URL-field of an entry is prepared
-     - ending slash will be removed
-     - missing scheme in front of entryURL will add "http://" to the beginning of entryURL
-  - baseSubmitURL is the submitURL without ending filename and arguments (http://www.example.org/index.php?arg=1 --> http://www.example.org)
-  - baseEntryURL is the entryURL without ending filename and arguments
-  - sort order by highest matching:
-     1. submitURL == entryURL
-     2. submitURL starts with entryURL and entryURL != host (1) and baseSubmitURL != entryURL
-     3. submitURL starts with baseEntryURL and entryURL != host (1) and baseSubmitURL != baseEntryURL
-     4. entryURL == host (1)
-     5. entryURL == baseSubmitURL
-     6. entryURL starts with submitURL
-     7. entryURL starts with baseSubmitURL and baseSubmitURL != host (1)
-     8. submitURL starts with entryURL
-     9. submitURL starts with baseEntryURL
-     10. entryURL starts with host (1)
-     11. host (1) starts with entryURL
-     12. otherwise last position in list
-5. If the setting for best matching entries is activated only the entries with the highest matching of step 4 will be returned.
+CompareToUrl = SubmitURL if set, URL otherwise
+
+For every entry, the [Levenshtein Distance](http://en.wikipedia.org/wiki/Levenshtein_distance) of his Entry-URL (or Title, if Entry-URL is not set) to the CompareToURL is calculated.
+
+Only the Entries with the minimal distance are returned.
+
+###Example:
+Submit-Url: http://www.host.com/subdomain1/login
+
+Entry-URL|Distance
+---|---
+http://www.host.com/|16
+http://www.host.com/subdomain1|6
+http://www.host.com/subdomain2|7
+
+__Result:__ second entry is returned
+
  
 ## Security
 

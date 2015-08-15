@@ -319,112 +319,53 @@ namespace KeePassHttp {
                     }
                 }
 
-                //if (r.SortSelection == "true" || configOpt.SpecificMatchingOnly)
-                //{
-                    string sortHost = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
-                    if (sortHost.EndsWith("/"))
-                        sortHost = sortHost.Substring(0, sortHost.Length - 1);
+                string compareToUrl = null;
+                if (r.SubmitUrl != null)
+                {
+                    compareToUrl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                }
+                if(String.IsNullOrEmpty(compareToUrl))
+                    compareToUrl = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
 
-                    string sortSubmiturl = null;
-                    if(r.SubmitUrl != null)
-                        sortSubmiturl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
-                    if (sortSubmiturl == null)
-                        sortSubmiturl = String.Copy(sortHost);
-                    if (sortSubmiturl.EndsWith("/"))
-                        sortSubmiturl = sortSubmiturl.Substring(0, sortSubmiturl.Length - 1);
+                compareToUrl = compareToUrl.ToLower();
 
-                    if (!sortSubmiturl.Contains("://"))
-                        sortSubmiturl = "http://" + sortSubmiturl;
-                    if (!sortHost.Contains("://"))
-                        sortHost = "http://" + sortHost;
+                foreach (var entryDatabase in items)
+                {
+                    string entryUrl = String.Copy(entryDatabase.entry.Strings.ReadSafe(PwDefs.UrlField));
+                    if (String.IsNullOrEmpty(entryUrl))
+                        entryUrl = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
 
-                    string sortBaseSubmiturl = String.Copy(sortSubmiturl);
-                    if (sortSubmiturl.LastIndexOf("/") > 7)
-                    {
-                        Uri sortBaseSubmithostURI = new Uri(sortSubmiturl);
-                        sortBaseSubmiturl = String.Format("{0}{1}{2}{3}",
-                            sortBaseSubmithostURI.Scheme,
-                            Uri.SchemeDelimiter,
-                            sortBaseSubmithostURI.Authority,
-                            sortBaseSubmithostURI.AbsolutePath.Substring(0, sortBaseSubmithostURI.AbsolutePath.LastIndexOf("/"))
-                        );
-                    }
+                    entryUrl = entryUrl.ToLower();
 
-                    sortSubmiturl = sortSubmiturl.ToLower();
-                    sortHost = sortHost.ToLower();
-                    sortBaseSubmiturl = sortBaseSubmiturl.ToLower();
+                    entryDatabase.entry.UsageCount = (ulong)LevenshteinDistance(compareToUrl, entryUrl);
 
-                    foreach (var entryDatabase in items)
-                    {
-                        string entryUrl = String.Copy(entryDatabase.entry.Strings.ReadSafe(PwDefs.UrlField));
-                        if (entryUrl.EndsWith("/"))
-                            entryUrl = entryUrl.Substring(0, entryUrl.Length - 1);
-                        entryUrl = entryUrl.ToLower();
-                        if (!entryUrl.Contains("://"))
-                            entryUrl = "http://" + entryUrl;
-
-                        string baseEntryUrl = String.Copy(entryUrl);
-                        if (baseEntryUrl.LastIndexOf("/") > 7)
-                        {
-                            Uri baseEntryUrlURI = new Uri(entryUrl);
-                            baseEntryUrl = String.Format("{0}{1}{2}{3}", baseEntryUrlURI.Scheme,
-                                Uri.SchemeDelimiter, baseEntryUrlURI.Authority, baseEntryUrlURI.AbsolutePath.Substring(0, baseEntryUrlURI.AbsolutePath.LastIndexOf("/")));
-                        }
-
-                        if (sortSubmiturl == entryUrl)
-                            entryDatabase.entry.UsageCount = 90;
-                        else if (sortSubmiturl.StartsWith(entryUrl) && sortHost != entryUrl && sortBaseSubmiturl != entryUrl)
-                            entryDatabase.entry.UsageCount = 80;
-                        else if (sortSubmiturl.StartsWith(baseEntryUrl) && sortHost != baseEntryUrl && sortBaseSubmiturl != baseEntryUrl)
-                            entryDatabase.entry.UsageCount = 70;
-                        else if (sortHost == entryUrl)
-                            entryDatabase.entry.UsageCount = 50;
-                        else if (sortBaseSubmiturl == entryUrl)
-                            entryDatabase.entry.UsageCount = 40;
-                        else if (entryUrl.StartsWith(sortSubmiturl))
-                            entryDatabase.entry.UsageCount = 30;
-                        else if (entryUrl.StartsWith(sortBaseSubmiturl) && sortBaseSubmiturl != sortHost)
-                            entryDatabase.entry.UsageCount = 25;
-                        else if (sortSubmiturl.StartsWith(entryUrl))
-                            entryDatabase.entry.UsageCount = 20;
-                        else if (sortSubmiturl.StartsWith(baseEntryUrl))
-                            entryDatabase.entry.UsageCount = 15;
-                        else if (entryUrl.StartsWith(sortHost))
-                            entryDatabase.entry.UsageCount = 10;
-                        else if (sortHost.StartsWith(entryUrl))
-                            entryDatabase.entry.UsageCount = 5;
-                        else
-                            entryDatabase.entry.UsageCount = 1;
-                    }
-                //}
+                }
 
                 var itemsList = items.ToList();
 
                 if (configOpt.SpecificMatchingOnly)
                 {
-                    ulong highestCount = 0;
-                    foreach (var entryDatabase in itemsList.ToList())
-                    {
-                        if (highestCount == 0)
-                        {
-                            highestCount = entryDatabase.entry.UsageCount;
-                        }
+                    itemsList = (from e in itemsList 
+                                 orderby e.entry.UsageCount ascending 
+                                 select e).ToList();
 
-                        if (entryDatabase.entry.UsageCount != highestCount)
-                        {
-                            itemsList.Remove(entryDatabase);
-                        }
-                    }
+                    ulong lowestDistance = itemsList[0].entry.UsageCount;
+
+                    itemsList = (from e in itemsList
+                                 where e.entry.UsageCount == lowestDistance
+                                 orderby e.entry.UsageCount
+                                 select e).ToList();
+                    
                 }
 
                 if (configOpt.SortResultByUsername)
                 {
-                    var items2 = from e in itemsList orderby e.entry.UsageCount descending, GetUserPass(e)[0] ascending select e;
+                    var items2 = from e in itemsList orderby e.entry.UsageCount ascending, GetUserPass(e)[0] ascending select e;
                     itemsList = items2.ToList();
                 }
                 else
                 {
-                    var items2 = from e in itemsList orderby e.entry.UsageCount descending, e.entry.Strings.ReadSafe(PwDefs.TitleField) ascending select e;
+                    var items2 = from e in itemsList orderby e.entry.UsageCount ascending, e.entry.Strings.ReadSafe(PwDefs.TitleField) ascending select e;
                     itemsList = items2.ToList();
                 }
 
@@ -436,6 +377,46 @@ namespace KeePassHttp {
                 resp.Id = r.Id;
                 SetResponseVerifier(resp, aes);
             }
+        }
+        //http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C.23
+        private int LevenshteinDistance(string source, string target)
+        {
+            if (String.IsNullOrEmpty(source))
+            {
+                if (String.IsNullOrEmpty(target)) return 0;
+                return target.Length;
+            }
+            if (String.IsNullOrEmpty(target)) return source.Length;
+
+            if (source.Length > target.Length)
+            {
+                var temp = target;
+                target = source;
+                source = temp;
+            }
+
+            var m = target.Length;
+            var n = source.Length;
+            var distance = new int[2, m + 1];
+            // Initialize the distance 'matrix'
+            for (var j = 1; j <= m; j++) distance[0, j] = j;
+
+            var currentRow = 0;
+            for (var i = 1; i <= n; ++i)
+            {
+                currentRow = i & 1;
+                distance[currentRow, 0] = i;
+                var previousRow = currentRow ^ 1;
+                for (var j = 1; j <= m; j++)
+                {
+                    var cost = (target[j - 1] == source[i - 1] ? 0 : 1);
+                    distance[currentRow, j] = Math.Min(Math.Min(
+                                            distance[previousRow, j] + 1,
+                                            distance[currentRow, j - 1] + 1),
+                                            distance[previousRow, j - 1] + cost);
+                }
+            }
+            return distance[currentRow, m];
         }
 
 		private void CompleteGetLoginsResult(List<PwEntryDatabase> itemsList, ConfigOpt configOpt, Response resp, String rId, String host, Aes aes)
