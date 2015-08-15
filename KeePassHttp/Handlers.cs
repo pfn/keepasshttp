@@ -85,15 +85,10 @@ namespace KeePassHttp {
             if (!VerifyRequest(r, aes))
                 return;
 
-            var list = new PwObjectList<PwEntry>();
-
             var root = host.Database.RootGroup;
 
-            var parms = MakeSearchParameters();
+            var list = root.GetEntries(true);
 
-            parms.SearchString = @"^[A-Za-z0-9:/-]+\.[A-Za-z0-9:/-]+$"; // match anything looking like a domain or url
-
-            root.SearchEntries(parms, list);
             foreach (var entry in list)
             {
                 var name = entry.Strings.ReadSafe(PwDefs.TitleField);
@@ -370,43 +365,7 @@ namespace KeePassHttp {
                     itemsList = items2.ToList();
                 }
 
-                foreach (var entryDatabase in itemsList)
-                {
-                    var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
-                    resp.Entries.Add(e);
-                }
-
-                if (itemsList.Count > 0)
-                {
-                    var names = (from e in resp.Entries select e.Name).Distinct<string>();
-                    var n = String.Join("\n    ", names.ToArray<string>());
-
-                    if (configOpt.ReceiveCredentialNotification)
-                        ShowNotification(String.Format("{0}: {1} is receiving credentials for:\n    {2}", r.Id, host, n));
-                }
-
-                resp.Success = true;
-                resp.Id = r.Id;
-                SetResponseVerifier(resp, aes);
-
-                foreach (var entry in resp.Entries)
-                {
-                    entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
-                    entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
-                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
-                    entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
-
-                    if (entry.StringFields != null)
-                    {
-                        foreach (var sf in entry.StringFields)
-                        {
-                            sf.Key = CryptoTransform(sf.Key, false, true, aes, CMode.ENCRYPT);
-                            sf.Value = CryptoTransform(sf.Value, false, true, aes, CMode.ENCRYPT);
-                        }
-                    }
-                }
-
-                resp.Count = resp.Entries.Count;
+                CompleteGetLoginsResult(itemsList,configOpt,resp,r.Id,host,aes);
             }
             else
             {
@@ -454,6 +413,119 @@ namespace KeePassHttp {
                 }
             }
             return distance[currentRow, m];
+        }
+
+        private void CompleteGetLoginsResult(List<PwEntryDatabase> itemsList, ConfigOpt configOpt, Response resp, String rId, String host, Aes aes)
+        {
+            foreach (var entryDatabase in itemsList)
+            {
+                var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
+                resp.Entries.Add(e);
+            }
+
+            if (itemsList.Count > 0)
+            {
+                var names = (from e in resp.Entries select e.Name).Distinct<string>();
+                var n = String.Join("\n    ", names.ToArray<string>());
+
+                if (configOpt.ReceiveCredentialNotification)
+                {
+                    String notificationMessage;
+                    if (host == null)
+                    {
+                        notificationMessage = rId;
+                    }
+                    else
+                    {
+                        notificationMessage = String.Format("{0}: {1}", rId, host);
+                    }
+                    notificationMessage = String.Format("{0} is receiving credentials for:\n    {1}", notificationMessage, n);
+                    ShowNotification(notificationMessage);
+                }
+            }
+
+            resp.Success = true;
+            resp.Id = rId;
+            SetResponseVerifier(resp, aes);
+
+            foreach (var entry in resp.Entries)
+            {
+                entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+                entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+                entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
+                entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
+
+                if (entry.StringFields != null)
+                {
+                    foreach (var sf in entry.StringFields)
+                    {
+                        sf.Key = CryptoTransform(sf.Key, false, true, aes, CMode.ENCRYPT);
+                        sf.Value = CryptoTransform(sf.Value, false, true, aes, CMode.ENCRYPT);
+                    }
+                }
+            }
+
+            resp.Count = resp.Entries.Count;
+        }
+
+        private void GetLoginsByNamesHandler(Request r, Response resp, Aes aes)
+        {
+            if (!VerifyRequest(r, aes))
+                return;
+
+            if (r.Names == null)
+            {
+                return;
+            }
+            List<String> decryptedNames = new List<String>();
+            foreach (String name in r.Names) {
+                if (name != null) {
+                    decryptedNames.Add(CryptoTransform(name, true, false, aes, CMode.DECRYPT));
+                }
+            }
+
+            List<PwDatabase> listDatabases = new List<PwDatabase>();
+            
+            var configOpt = new ConfigOpt(this.host.CustomConfig);
+            if (configOpt.SearchInAllOpenedDatabases)
+            {
+                foreach (PwDocument doc in host.MainWindow.DocumentManager.Documents)
+                {
+                    if (doc.Database.IsOpen)
+                    {
+                        listDatabases.Add(doc.Database);
+                    }
+                }
+            }
+            else
+            {
+                listDatabases.Add(host.Database);
+            }
+
+            var listEntries = new List<PwEntryDatabase>();
+            foreach (PwDatabase db in listDatabases)
+            {
+                foreach (var le in db.RootGroup.GetEntries(true)) {
+                    var title = le.Strings.ReadSafe(PwDefs.TitleField);
+                    bool titleMatched = false;
+                    if (title != null) {
+                        foreach (String name in decryptedNames)
+                        {
+                            if (name.Equals(title))
+                            {
+                                titleMatched = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (titleMatched)
+                    {
+                        listEntries.Add(new PwEntryDatabase(le, db));
+                    }
+                }
+            }
+
+            CompleteGetLoginsResult(listEntries, configOpt, resp, r.Id, null, aes);
         }
 
         private ResponseEntry PrepareElementForResponseEntries(ConfigOpt configOpt, PwEntryDatabase entryDatabase)
