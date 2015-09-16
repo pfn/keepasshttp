@@ -113,6 +113,145 @@ namespace KeePassHttp {
             }
         }
 
+        private void GetLoginsCustomSearchHandler(Request r, Response resp, Aes aes)
+        {
+            if (!VerifyRequest(r, aes))
+                return;
+
+            string clientId = r.Id;
+
+            string searchString = null;
+            if (r.SearchString != null)
+                searchString = CryptoTransform(r.SearchString, true, false, aes, CMode.DECRYPT);
+
+            var items = FindMatchingEntriesLikeSearchbox(r, aes);
+            if (items.ToList().Count > 0)
+            {
+                Func<PwEntry, bool> filter = delegate (PwEntry e)
+                {
+                    var c = GetEntryConfig(e);
+                    if (c != null)
+                    {
+                        return !c.Allow.Contains(clientId);
+                    }
+                    return true;
+                };
+
+                var configOpt = new ConfigOpt(this.host.CustomConfig);
+                var config = GetConfigEntry(true);
+                var autoAllowS = config.Strings.ReadSafe("Auto Allow");
+                var autoAllow = autoAllowS != null && autoAllowS.Trim() != "";
+                autoAllow = autoAllow || configOpt.AlwaysAllowAccess;
+                var needPrompting = from e in items where filter(e.entry) select e;
+
+                if (needPrompting.ToList().Count > 0 && !autoAllow)
+                {
+                    var win = this.host.MainWindow;
+
+                    using (var f = new AccessControlForm())
+                    {
+                        win.Invoke((MethodInvoker)delegate
+                        {
+                            f.Icon = win.Icon;
+                            f.Plugin = this;
+                            f.Entries = (from e in items where filter(e.entry) select e.entry).ToList();
+                            f.Host = clientId;
+                            f.Load += delegate { f.Activate(); };
+                            f.ShowDialog(win);
+                            if (f.Remember && (f.Allowed || f.Denied))
+                            {
+                                foreach (var e in needPrompting)
+                                {
+                                    var c = GetEntryConfig(e.entry);
+                                    if (c == null)
+                                        c = new KeePassHttpEntryConfig();
+                                    var set = f.Allowed ? c.Allow : c.Deny;
+                                    set.Add(clientId);
+                                    SetEntryConfig(e.entry, c);
+                                }
+                            }
+                            if (!f.Allowed)
+                            {
+                                items = items.Except(needPrompting);
+                            }
+                        });
+                    }
+                }
+
+                var itemsList = items.ToList();
+
+                if (configOpt.SpecificMatchingOnly)
+                {
+                    itemsList = (from e in itemsList
+                                 orderby e.entry.UsageCount ascending
+                                 select e).ToList();
+
+                    ulong lowestDistance = itemsList[0].entry.UsageCount;
+
+                    itemsList = (from e in itemsList
+                                 where e.entry.UsageCount == lowestDistance
+                                 orderby e.entry.UsageCount
+                                 select e).ToList();
+
+                }
+
+                if (configOpt.SortResultByUsername)
+                {
+                    var items2 = from e in itemsList orderby e.entry.UsageCount ascending, GetUserPass(e)[0] ascending select e;
+                    itemsList = items2.ToList();
+                }
+                else
+                {
+                    var items2 = from e in itemsList orderby e.entry.UsageCount ascending, e.entry.Strings.ReadSafe(PwDefs.TitleField) ascending select e;
+                    itemsList = items2.ToList();
+                }
+
+                foreach (var entryDatabase in itemsList)
+                {
+                    var e = PrepareElementForResponseEntries(configOpt, entryDatabase);
+                    resp.Entries.Add(e);
+                }
+
+                if (itemsList.Count > 0)
+                {
+                    var names = (from e in resp.Entries select e.Name).Distinct<string>();
+                    var n = String.Join("\n    ", names.ToArray<string>());
+
+                    if (configOpt.ReceiveCredentialNotification)
+                        ShowNotification(String.Format("{0}: is receiving credentials for:\n    {1}", r.Id, n));
+                }
+
+                resp.Success = true;
+                resp.Id = r.Id;
+                SetResponseVerifier(resp, aes);
+
+                foreach (var entry in resp.Entries)
+                {
+                    entry.Name = CryptoTransform(entry.Name, false, true, aes, CMode.ENCRYPT);
+                    entry.Login = CryptoTransform(entry.Login, false, true, aes, CMode.ENCRYPT);
+                    entry.Uuid = CryptoTransform(entry.Uuid, false, true, aes, CMode.ENCRYPT);
+                    entry.Password = CryptoTransform(entry.Password, false, true, aes, CMode.ENCRYPT);
+
+                    if (entry.StringFields != null)
+                    {
+                        foreach (var sf in entry.StringFields)
+                        {
+                            sf.Key = CryptoTransform(sf.Key, false, true, aes, CMode.ENCRYPT);
+                            sf.Value = CryptoTransform(sf.Value, false, true, aes, CMode.ENCRYPT);
+                        }
+                    }
+                }
+
+                resp.Count = resp.Entries.Count;
+            }
+            else
+            {
+                resp.Success = true;
+                resp.Id = r.Id;
+                SetResponseVerifier(resp, aes);
+            }
+        }
+
         private IEnumerable<PwEntryDatabase> FindMatchingEntries(Request r, Aes aes)
         {
             string submitHost = null;
@@ -235,6 +374,58 @@ namespace KeePassHttp {
             }
 
             return result;
+        }
+
+        private IEnumerable<PwEntryDatabase> FindMatchingEntriesLikeSearchbox(Request r, Aes aes)
+        {
+            string searchString = null;
+            string realm = null;
+            var listResult = new List<PwEntryDatabase>();
+            if (r.SearchString != null)
+            {
+                searchString = CryptoTransform(r.SearchString, true, false, aes, CMode.DECRYPT);
+            }
+
+            if (r.Realm != null)
+                realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
+
+            var parms = MakeSearchParametersLikeSearchBox();
+
+            List<PwDatabase> listDatabases = new List<PwDatabase>();
+
+            var configOpt = new ConfigOpt(this.host.CustomConfig);
+            if (configOpt.SearchInAllOpenedDatabases)
+            {
+                foreach (PwDocument doc in host.MainWindow.DocumentManager.Documents)
+                {
+                    if (doc.Database.IsOpen)
+                    {
+                        listDatabases.Add(doc.Database);
+                    }
+                }
+            }
+            else
+            {
+                listDatabases.Add(host.Database);
+            }
+
+            int listCount = 0;
+            foreach (PwDatabase db in listDatabases)
+            {
+                while (listResult.Count == listCount)
+                {
+                    parms.SearchString = searchString;
+                    var listEntries = new PwObjectList<PwEntry>();
+                    db.RootGroup.SearchEntries(parms, listEntries);
+                    foreach (var le in listEntries)
+                    {
+                        listResult.Add(new PwEntryDatabase(le, db));
+                    }
+                }
+                listCount = listResult.Count;
+            }
+
+            return listResult;
         }
 
         private void GetLoginsCountHandler(Request r, Response resp, Aes aes)
