@@ -412,17 +412,13 @@ namespace KeePassHttp {
             int listCount = 0;
             foreach (PwDatabase db in listDatabases)
             {
-                while (listResult.Count == listCount)
+                parms.SearchString = searchString;
+                var listEntries = new PwObjectList<PwEntry>();
+                db.RootGroup.SearchEntries(parms, listEntries);
+                foreach (var le in listEntries)
                 {
-                    parms.SearchString = searchString;
-                    var listEntries = new PwObjectList<PwEntry>();
-                    db.RootGroup.SearchEntries(parms, listEntries);
-                    foreach (var le in listEntries)
-                    {
-                        listResult.Add(new PwEntryDatabase(le, db));
-                    }
+                    listResult.Add(new PwEntryDatabase(le, db));
                 }
-                listCount = listResult.Count;
             }
 
             return listResult;
