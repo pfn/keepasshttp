@@ -470,10 +470,17 @@ namespace KeePassHttp {
                 fields = new List<ResponseStringField>();
                 foreach (var sf in entryDatabase.entry.Strings)
                 {
-                    if (sf.Key.StartsWith("KPH: "))
+                    var sfValue = entryDatabase.entry.Strings.ReadSafe(sf.Key);
+                    if (configOpt.ReturnStringFieldsWithKphOnly)
                     {
-                        var sfValue = entryDatabase.entry.Strings.ReadSafe(sf.Key);
-                        fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
+                        if (sf.Key.StartsWith("KPH: "))
+                        {
+                            fields.Add(new ResponseStringField(sf.Key.Substring(5), sfValue));
+                        }
+                    }
+                    else
+                    {
+                        fields.Add(new ResponseStringField(sf.Key, sfValue));
                     }
                 }
 
