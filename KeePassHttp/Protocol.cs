@@ -60,6 +60,7 @@ namespace KeePassHttp
     public class Request
     {
         public const string GET_LOGINS = "get-logins";
+        public const string GET_LOGINS_CUSTOM_SEARCH = "get-logins-custom-search";
         public const string GET_LOGINS_COUNT = "get-logins-count";
         public const string GET_ALL_LOGINS = "get-all-logins";
         public const string SET_LOGIN = "set-login";
@@ -98,6 +99,11 @@ namespace KeePassHttp
         public string SubmitUrl;
 
         /// <summary>
+        /// Always encrypted, used with get-logins-custom-search
+        /// </summary>
+        public string SearchString;
+
+        /// <summary>
         /// Send the AES key ID with the 'associate' request
         /// </summary>
         public string Key;
@@ -129,7 +135,7 @@ namespace KeePassHttp
         {
             RequestType = request;
 
-            if (request == Request.GET_LOGINS || request == Request.GET_ALL_LOGINS || request == Request.GENERATE_PASSWORD)
+            if (request == Request.GET_LOGINS || request == Request.GET_ALL_LOGINS || request == Request.GENERATE_PASSWORD || request == Request.GET_LOGINS_CUSTOM_SEARCH)
                 Entries = new List<ResponseEntry>();
             else
                 Entries = null;

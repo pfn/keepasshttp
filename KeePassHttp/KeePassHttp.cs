@@ -73,6 +73,22 @@ namespace KeePassHttp
             return p;
         }
 
+        private SearchParameters MakeSearchParametersLikeSearchBox()
+        {
+            var p = new SearchParameters();
+            p.SearchInTitles = true;
+            p.RegularExpression = false;
+            p.SearchInGroupNames = true;
+            p.SearchInNotes = true;
+            p.SearchInOther = true;
+            p.SearchInPasswords = true;
+            p.SearchInTags = true;
+            p.SearchInUrls = true;
+            p.SearchInUserNames = true;
+            p.SearchInUuids = true;
+            return p;
+        }
+
         private string CryptoTransform(string input, bool base64in, bool base64out, Aes cipher, CMode mode)
         {
             byte[] bytes;
@@ -192,6 +208,7 @@ namespace KeePassHttp
                     handlers.Add(Request.TEST_ASSOCIATE, TestAssociateHandler);
                     handlers.Add(Request.ASSOCIATE, AssociateHandler);
                     handlers.Add(Request.GET_LOGINS, GetLoginsHandler);
+                    handlers.Add(Request.GET_LOGINS_CUSTOM_SEARCH, GetLoginsCustomSearchHandler);
                     handlers.Add(Request.GET_LOGINS_COUNT, GetLoginsCountHandler);
                     handlers.Add(Request.GET_ALL_LOGINS, GetAllLoginsHandler);
                     handlers.Add(Request.SET_LOGIN, SetLoginHandler);
