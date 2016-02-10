@@ -35,6 +35,8 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](ht
 	* default directory in Arch: /usr/share/keepass
  3. Set chmod 644 on file `KeePassHttp.plgx`
  4. On linux systems you maybe need to install mono-complete: `$ apt-get install mono-complete` (in Debian it should be enough to install the packages libmono-system-runtime-serialization4.0-cil and libmono-posix2.0-cil)
+ * Tips to run KeePassHttp on lastest KeePass 2.31: install packages
+ 	`sudo apt-get install libmono-system-xml-linq4.0-cil libmono-system-data-datasetextensions4.0-cil libmono-system-runtime-serialization4.0-cil mono-mcs`
  5. Restart KeePass
 
 ### KeePassHttp on Linux and Mac
