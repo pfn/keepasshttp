@@ -350,7 +350,9 @@ namespace KeePassHttp {
                                  orderby e.entry.UsageCount ascending 
                                  select e).ToList();
 
-                    ulong lowestDistance = itemsList[0].entry.UsageCount;
+                    ulong lowestDistance = itemsList.Count > 0 ?
+                        itemsList[0].entry.UsageCount :
+                        0;
 
                     itemsList = (from e in itemsList
                                  where e.entry.UsageCount == lowestDistance
