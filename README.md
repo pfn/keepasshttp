@@ -1,3 +1,18 @@
+# About this fork
+This fork is to support running KeePassHttp plugin with [Wine](https://www.winehq.org/) on non-Windows systems, as
+opposed to running with [Mono](http://www.mono-project.com/). The upstream KeePassHttp plugin currently suffers from
+[ISSUE-121](https://github.com/pfn/keepasshttp/issues/121) with Wine. We work around the issue by switching to a managed
+implementation of `HttpListener` extracted from Mono,
+[mono.net.httplistener](https://github.com/jbevain/mono.net.httplistener/).
+
+To install, download [KeePassHttp](https://raw.github.com/jasonxh/keepasshttp/mono-http/KeePassHttp.plgx) and copy it to
+the `Plugins` folder under the KeePass 2 installation in your Wine prefix. There are also pre-compiled binaries
+[here](mono) if `.plgx` doesn't work for you.
+
+Tested on Mac with [WineBottler](http://winebottler.kronenberg.org/) 1.8-rc4. Should work with later versions of Wine
+too. Remember to apply [winetricks](https://wiki.winehq.org/Winetricks) `dotnet40` before installing KeePass 2 with
+Wine.
+
 # KeePassHttp
 
 is a plugin for KeePass 2.x and provides a secure means of exposing KeePass entries via HTTP for clients to
@@ -29,7 +44,7 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](ht
 
 ## Non-Windows / Manual Windows installation
 
- 1. Download [KeePassHttp](https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx)
+ 1. Download [KeePassHttp](https://raw.github.com/jasonxh/keepasshttp/mono-http/KeePassHttp.plgx)
  2. Copy it into the KeePass directory
 	* default directory in Ubuntu14.04: /usr/lib/keepass2/
 	* default directory in Arch: /usr/share/keepass
@@ -45,7 +60,7 @@ KeePass needs Mono. You can find detailed [installation instructions on the offi
 
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 With Mono 2.6.7 and a version of KeePass lower than 2.20 he could not get the plgx file to work on linux.
-If the plgx file does also not work for you, you can try the two DLL files KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono) which should work for you.
+If the plgx file does also not work for you, you can try the DLL files KeePassHttp.dll, Mono.Net.HttpListener.dll, Mono.Security.dll, and Newtonsoft.Json.dll from directory [mono](mono) which should work for you.
 
 With newer versions of Mono and KeePass it seems that the plgx file works pretty fine.
 More information about it are contained in the following experience report.
