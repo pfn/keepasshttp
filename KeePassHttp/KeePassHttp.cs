@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Net;
 using System.Windows.Forms;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography;
@@ -19,6 +18,10 @@ using Newtonsoft.Json;
 using KeePass.Util.Spr;
 using KeePassLib.Serialization;
 using System.Resources;
+
+// use mono's implementation of HttpListener to avoid dependency on httpapi.dll
+using Mono.Net;
+using HttpStatusCode = System.Net.HttpStatusCode;
 
 namespace KeePassHttp
 {
