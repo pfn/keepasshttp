@@ -193,7 +193,9 @@ If a new client has to connect to KeePassHttp, the encryption key is generated a
 
 If you want to develop new features or improve existing ones here is a way to build it at your own:
 
-1. copy the file [Newtonsoft.Json.dll](http://json.codeplex.com/releases/) into the sourcecode folder
+1. copy dependencies into the sourcecode folder
+  * [Newtonsoft.Json.dll](http://json.codeplex.com/releases/)
+  * [Mono.Net.HttpListener.dll & Mono.Security.dll](https://www.nuget.org/packages/Mono.Net.HttpListener/). Download and unzip the nupkg file and the DLLs are under `lib\net40`.
 2. delete the directory "bin" from sourcecode
 3. delete the directory "obj" from sourcecode
 4. delete the file "KeePassHttp.dll"
