@@ -221,3 +221,55 @@ This is the only point at which an administrator snooping traffic will be able t
 2. server verifies payload and responds with success to client
 3. client sends any of "get-logins-count", "get-logins", "set-login" using the previously negotiated key in (A)
 4. if any subsequent request fails, it is necessary to "test-associate" again
+
+## A little deeper into protocol
+
+### Generic HTTP request
+(based on packet sniffing and code analyssis)
+Generic HTTP request is json sent in POST message. Cipher, by means of OpenSSL library is `AES-256-CBC`, so key is 32 byte long. 
+
+```
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+```
+
+Also, minimal JSON request (except that one without key set up) consists of four main parameters:
+ - RequestType - `test-associate`, `associate`, `get-logins`, `get-logins-count`, `set-login`, ...
+ - TriggerUnlock - TODO: what is this good for? seems always false
+ - Nonce - 128 bit (16 bytes) long random vector, base64 encoded, used as IV for aes encryption
+ - Verifier - verifier, base64 encoded AES encrypted data: `encrypt(base64_encode($nonce), $key, $nonce);`
+ - Id - Key id entered into KeePass GUI while  `associate`, not used during `associate`
+
+### test-associate
+Request:
+```javascript
+{
+    "RequestType":"test-associate",
+    "TriggerUnlock":false
+}
+``` 
+
+Response:
+```javascript
+{
+    "Count":null,
+    "Entries":null,
+    "Error":"",
+    "Hash":"d8312a59523d3c37d6a5401d3cfddd077e194680",
+    "Id":"",
+    "Nonce":"",
+    "RequestType":"test-associate",
+    "Success":false,
+    "Verifier":"",
+    "Version":"1.8.4.1",
+    "objectName":""
+}
+```
+
