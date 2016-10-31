@@ -248,7 +248,7 @@ Also, minimal JSON request (except that one without key set up) consists of four
  - Id - Key id entered into KeePass GUI while  `associate`, not used during `associate`
 
 ### test-associate
-Request:
+Request, without key, seems like initialization of every key assignation session:
 ```javascript
 {
     "RequestType":"test-associate",
@@ -256,7 +256,7 @@ Request:
 }
 ``` 
 
-Response:
+Response: (without success)
 ```javascript
 {
     "Count":null,
@@ -272,4 +272,95 @@ Response:
     "objectName":""
 }
 ```
+
+If you have key, you can test with request like this: 
+```javascript
+{
+    "Nonce":"+bG+EpbCR4jSnjROKAAw4A==", // random 128bit vector, base64 encoded
+    "Verifier":"2nVUxyddGpe62WGx5cm3hcb604Xn8AXrYxUK2WP9dU0=", // Nonce in base64 form, encoded with aes
+    "RequestType":"test-associate",
+    "TriggerUnlock":false,
+    "Id":"PHP"
+}
+```
+
+### associate
+Request:
+```javascript
+{
+    "RequestType":"associate",
+    "Key":"CRyXRbH9vBkdPrkdm52S3bTG2rGtnYuyJttk/mlJ15g=", // Base64 encoded 256 bit key
+    "Nonce":"epIt2nuAZbHt5JgEsxolWg==",
+    "Verifier":"Lj+3N58jkjoxS2zNRmTpeQ4g065OlFfJsHNQWYaOJto="
+}
+```
+
+Response:
+```javascript
+{
+    "Count":null,
+    "Entries":null,
+    "Error":"",
+    "Hash":"d8312a59523d3c37d6a5401d3cfddd077e194680",
+    "Id":"PHP", // You need to save this - to use in future
+    "Nonce":"cJUFe18NSThQ/0yAqZMaDA==",
+    "RequestType":"associate",
+    "Success":true,
+    "Verifier":"ChH0PtuQWP4UKTPhdP3XSgwFyVdekHmHT7YdL1EKA+A=",
+    "Version":"1.8.4.1",
+    "objectName":""
+}
+```
+
+### get-logins
+
+Request:
+```javascript
+{
+    "RequestType":"get-logins",
+    "SortSelection":"true",
+    "TriggerUnlock":"false",
+    "Id":"PHP",
+    "Nonce":"vCysO8UwsWyE2b+nMzE3/Q==",
+    "Verifier":"5Nyi5973GawqdP3qF9QlAF/KlZAyvb6c5Smhun8n9wA=",
+    "Url":"Gz+ZCSjHAGmeYdrtS78hSxH3yD5LiYidSq9n+8TdQXc=", // Encrypted URL
+    "SubmitUrl":"<snip>" // Encrypted submit URL
+}
+```
+
+Response:
+```javascript
+{
+    "Count":3,
+    "Entries":[
+        {
+            "Login":"{encrypted login base64}",
+            "Name":"{encrypted item name}",
+            "Password":"{encrypted Password}",
+            "StringFields":null,
+            "Uuid":"{encrypted UUID}"
+        },
+        {
+            <snip>
+        },
+        {
+            <snip>
+        }
+    ],
+    "Error":"",
+    "Hash":"d8312a59523d3c37d6a5401d3cfddd077e194680",
+    "Id":"PHP",
+    "Nonce":"Aeh9maerCjE5v5V8Tz2YxA==",
+    "RequestType":"get-logins",
+    "Success":true,
+    "Verifier":"F87c4ggkMTSEptJT8/FypBH491kRexTAiEZxovLMvD8=",
+    "Version":"1.8.4.1",
+    "objectName":""
+}
+
+```
+
+ 
+
+
 
