@@ -366,7 +366,6 @@ Request:
 ```javascript
 {
     "RequestType":"get-logins-count",
-    "SortSelection":"true",
     "TriggerUnlock":"false",
     "Id":"PHP",
     "Nonce":"vCysO8UwsWyE2b+nMzE3/Q==",
