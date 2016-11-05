@@ -41,14 +41,19 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](ht
 
 ### KeePassHttp on Linux and Mac
 
-KeePass needs Mono. You can find detailed [installation instructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
+KeePass can run with Mono. You can find detailed [installation instructions on the official page of KeePass](http://keepass.info/help/v2/setup.html#mono).
 
 Perry has tested KeePassHttp with Mono 2.6.7 and it appears to work well.
 With Mono 2.6.7 and a version of KeePass lower than 2.20 he could not get the plgx file to work on linux.
-If the plgx file does also not work for you, you can try the two DLL files KeePassHttp.dll and Newtonsoft.Json.dll from directory [mono](https://github.com/pfn/keepasshttp/tree/master/mono) which should work for you.
+If the plgx file does also not work for you, you can try the DLL files KeePassHttp.dll, Mono.Net.HttpListener.dll, Mono.Security.dll, and Newtonsoft.Json.dll from directory [mono](mono) which should work for you.
 
 With newer versions of Mono and KeePass it seems that the plgx file works pretty fine.
 More information about it are contained in the following experience report.
+
+KeePass and KeePassHttp can also run with [Wine](https://appdb.winehq.org/objectManager.php?sClass=version&iId=19899&iTestingId=76353).
+On Mac, the experience with Wine may be much smoother than with Mono. You'll need to apply
+[winetricks](https://wiki.winehq.org/Winetricks) `dotnet40` before installing KeePass with Wine. Tested on Mac with
+[WineBottler](http://winebottler.kronenberg.org/) 1.8-rc4.
 
 #### Experience report by dunkelfuerst
 Just wanted to let you know, I'm running Fedora 18, which currently uses
@@ -188,7 +193,9 @@ If a new client has to connect to KeePassHttp, the encryption key is generated a
 
 If you want to develop new features or improve existing ones here is a way to build it at your own:
 
-1. copy the file [Newtonsoft.Json.dll](http://json.codeplex.com/releases/) into the sourcecode folder
+1. copy dependencies into the sourcecode folder
+  * [Newtonsoft.Json.dll](http://json.codeplex.com/releases/)
+  * [Mono.Net.HttpListener.dll & Mono.Security.dll](https://www.nuget.org/packages/Mono.Net.HttpListener/). Download and unzip the nupkg file and the DLLs are under `lib\net40`.
 2. delete the directory "bin" from sourcecode
 3. delete the directory "obj" from sourcecode
 4. delete the file "KeePassHttp.dll"
