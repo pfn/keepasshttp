@@ -41,6 +41,7 @@ namespace KeePassHttp
             credAllowAccessCheckbox.Checked = _config.AlwaysAllowAccess;
             credAllowUpdatesCheckbox.Checked = _config.AlwaysAllowUpdates;
             credSearchInAllOpenedDatabases.Checked = _config.SearchInAllOpenedDatabases;
+            hideExpiredCheckbox.Checked = _config.HideExpired;
             matchSchemesCheckbox.Checked = _config.MatchSchemes;
             returnStringFieldsCheckbox.Checked = _config.ReturnStringFields;
             returnStringFieldsWithKphOnlyCheckBox.Checked = _config.ReturnStringFieldsWithKphOnly;
@@ -60,6 +61,7 @@ namespace KeePassHttp
             _config.AlwaysAllowAccess = credAllowAccessCheckbox.Checked;
             _config.AlwaysAllowUpdates = credAllowUpdatesCheckbox.Checked;
             _config.SearchInAllOpenedDatabases = credSearchInAllOpenedDatabases.Checked;
+            _config.HideExpired = hideExpiredCheckbox.Checked;
             _config.MatchSchemes = matchSchemesCheckbox.Checked;
             _config.ReturnStringFields = returnStringFieldsCheckbox.Checked;
             _config.ReturnStringFieldsWithKphOnly = returnStringFieldsWithKphOnlyCheckBox.Checked;

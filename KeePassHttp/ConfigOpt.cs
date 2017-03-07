@@ -11,6 +11,7 @@ namespace KeePassHttp
         const string AlwaysAllowAccessKey = "KeePassHttp_AlwaysAllowAccess";
         const string AlwaysAllowUpdatesKey = "KeePassHttp_AlwaysAllowUpdates";
         const string SearchInAllOpenedDatabasesKey = "KeePassHttp_SearchInAllOpenedDatabases";
+        const string HideExpiredKey = "KeePassHttp_HideExpired";
         const string MatchSchemesKey = "KeePassHttp_MatchSchemes";
         const string ReturnStringFieldsKey = "KeePassHttp_ReturnStringFields";
         const string ReturnStringFieldsWithKphOnlyKey = "KeePassHttp_ReturnStringFieldsWithKphOnly";
@@ -59,6 +60,11 @@ namespace KeePassHttp
             set { _config.SetBool(SearchInAllOpenedDatabasesKey, value); }
         }
 
+        public bool HideExpired
+        {
+            get { return _config.GetBool(HideExpiredKey, false); }
+            set { _config.SetBool(HideExpiredKey, value); }
+        }
         public bool MatchSchemes
         {
             get { return _config.GetBool(MatchSchemesKey, false); }

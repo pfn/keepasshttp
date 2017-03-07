@@ -234,6 +234,23 @@ namespace KeePassHttp {
                 result = from e in result where filterSchemes(e.entry) select e;
             }
 
+            Func<PwEntry, bool> hideExpired = delegate(PwEntry e)
+            {
+                DateTime dtNow = DateTime.UtcNow;
+
+                if(e.Expires && (e.ExpiryTime <= dtNow))
+                {
+                    return false;
+                }
+
+                return true;
+            };
+
+            if (configOpt.HideExpired)
+            {
+                result = from e in result where hideExpired(e.entry) select e;
+            }
+
             return result;
         }
 
