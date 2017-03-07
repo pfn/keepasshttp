@@ -34,6 +34,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.SortByUsernameRadioButton = new System.Windows.Forms.RadioButton();
             this.SortByTitleRadioButton = new System.Windows.Forms.RadioButton();
+            this.hideExpiredCheckbox = new System.Windows.Forms.CheckBox();
             this.matchSchemesCheckbox = new System.Windows.Forms.CheckBox();
             this.removePermissionsButton = new System.Windows.Forms.Button();
             this.unlockDatabaseCheckbox = new System.Windows.Forms.CheckBox();
@@ -105,6 +106,7 @@
             // 
             this.tabPage1.Controls.Add(this.SortByUsernameRadioButton);
             this.tabPage1.Controls.Add(this.SortByTitleRadioButton);
+            this.tabPage1.Controls.Add(this.hideExpiredCheckbox);
             this.tabPage1.Controls.Add(this.matchSchemesCheckbox);
             this.tabPage1.Controls.Add(this.removePermissionsButton);
             this.tabPage1.Controls.Add(this.unlockDatabaseCheckbox);
@@ -122,7 +124,7 @@
             // SortByUsernameRadioButton
             // 
             this.SortByUsernameRadioButton.AutoSize = true;
-            this.SortByUsernameRadioButton.Location = new System.Drawing.Point(7, 124);
+            this.SortByUsernameRadioButton.Location = new System.Drawing.Point(7, 147);
             this.SortByUsernameRadioButton.Name = "SortByUsernameRadioButton";
             this.SortByUsernameRadioButton.Size = new System.Drawing.Size(171, 17);
             this.SortByUsernameRadioButton.TabIndex = 19;
@@ -133,18 +135,28 @@
             // SortByTitleRadioButton
             // 
             this.SortByTitleRadioButton.AutoSize = true;
-            this.SortByTitleRadioButton.Location = new System.Drawing.Point(7, 147);
+            this.SortByTitleRadioButton.Location = new System.Drawing.Point(7, 170);
             this.SortByTitleRadioButton.Name = "SortByTitleRadioButton";
             this.SortByTitleRadioButton.Size = new System.Drawing.Size(141, 17);
             this.SortByTitleRadioButton.TabIndex = 18;
             this.SortByTitleRadioButton.TabStop = true;
             this.SortByTitleRadioButton.Text = "Sort found entries by &title";
             this.SortByTitleRadioButton.UseVisualStyleBackColor = true;
-            // 
+            //
+            // hideExpiredCheckbox
+            //
+            this.hideExpiredCheckbox.AutoSize = true;
+            this.hideExpiredCheckbox.Location = new System.Drawing.Point(7, 88);
+            this.hideExpiredCheckbox.Name = "hideExpiredCheckbox";
+            this.hideExpiredCheckbox.Size = new System.Drawing.Size(256, 17);
+            this.hideExpiredCheckbox.TabIndex = 17;
+            this.hideExpiredCheckbox.Text = "Don't return e&xpired entries";
+            this.hideExpiredCheckbox.UseVisualStyleBackColor = true;
+            //
             // matchSchemesCheckbox
-            // 
+            //
             this.matchSchemesCheckbox.AutoSize = true;
-            this.matchSchemesCheckbox.Location = new System.Drawing.Point(7, 88);
+            this.matchSchemesCheckbox.Location = new System.Drawing.Point(7, 111);
             this.matchSchemesCheckbox.Name = "matchSchemesCheckbox";
             this.matchSchemesCheckbox.Size = new System.Drawing.Size(375, 30);
             this.matchSchemesCheckbox.TabIndex = 17;
@@ -157,7 +169,7 @@
             this.removePermissionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removePermissionsButton.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.removePermissionsButton.Location = new System.Drawing.Point(14, 216);
+            this.removePermissionsButton.Location = new System.Drawing.Point(14, 239);
             this.removePermissionsButton.Name = "removePermissionsButton";
             this.removePermissionsButton.Size = new System.Drawing.Size(372, 28);
             this.removePermissionsButton.TabIndex = 16;
@@ -179,7 +191,7 @@
             // 
             this.removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.removeButton.Location = new System.Drawing.Point(14, 182);
+            this.removeButton.Location = new System.Drawing.Point(14, 205);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(372, 28);
             this.removeButton.TabIndex = 11;
@@ -451,6 +463,7 @@
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.CheckBox hideExpiredCheckbox;
         private System.Windows.Forms.CheckBox matchSchemesCheckbox;
         private System.Windows.Forms.Button removePermissionsButton;
         private System.Windows.Forms.CheckBox unlockDatabaseCheckbox;
