@@ -240,10 +240,10 @@ namespace KeePassHttp {
 
                 if(e.Expires && (e.ExpiryTime <= dtNow))
                 {
-                    return true;
+                    return false;
                 }
 
-                return false;
+                return true;
             };
 
             if (configOpt.HideExpired)
