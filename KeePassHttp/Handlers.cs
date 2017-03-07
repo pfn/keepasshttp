@@ -236,7 +236,7 @@ namespace KeePassHttp {
 
             Func<PwEntry, bool> hideExpired = delegate(PwEntry e)
             {
-			    DateTime dtNow = DateTime.UtcNow;
+                DateTime dtNow = DateTime.UtcNow;
 
                 if(e.Expires && (e.ExpiryTime <= dtNow))
                 {
