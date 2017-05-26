@@ -18,6 +18,7 @@ using KeePass.UI;
 using KeePass;
 using KeePassLib.Cryptography.PasswordGenerator;
 using KeePassLib.Cryptography;
+using KeePass.Util.Spr;
 
 namespace KeePassHttp {
     public sealed partial class KeePassHttpExt : Plugin
@@ -477,8 +478,10 @@ namespace KeePassHttp {
 
         private ResponseEntry PrepareElementForResponseEntries(ConfigOpt configOpt, PwEntryDatabase entryDatabase)
         {
+            SprContext ctx = new SprContext(entryDatabase.entry, entryDatabase.database, SprCompileFlags.All, false, false);
+
             var name = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
-            var loginpass = GetUserPass(entryDatabase);
+            var loginpass = GetUserPass(entryDatabase, ctx);
             var login = loginpass[0];
             var passwd = loginpass[1];
             var uuid = entryDatabase.entry.Uuid.ToHexString();
@@ -490,6 +493,10 @@ namespace KeePassHttp {
                 foreach (var sf in entryDatabase.entry.Strings)
                 {
                     var sfValue = entryDatabase.entry.Strings.ReadSafe(sf.Key);
+                    
+                    // follow references
+                    sfValue = SprEngine.Compile(sfValue, ctx);
+
                     if (configOpt.ReturnStringFieldsWithKphOnly)
                     {
                         if (sf.Key.StartsWith("KPH: "))

@@ -410,6 +410,13 @@ namespace KeePassHttp
             // follow references
             SprContext ctx = new SprContext(entryDatabase.entry, entryDatabase.database,
                     SprCompileFlags.All, false, false);
+
+            return GetUserPass(entryDatabase, ctx);
+        }
+
+        internal string[] GetUserPass(PwEntryDatabase entryDatabase, SprContext ctx)
+        {
+            // follow references
             string user = SprEngine.Compile(
                     entryDatabase.entry.Strings.ReadSafe(PwDefs.UserNameField), ctx);
             string pass = SprEngine.Compile(
