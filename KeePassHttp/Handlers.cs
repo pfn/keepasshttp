@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 using KeePass.Plugins;
 using KeePassLib.Collections;
@@ -120,11 +121,15 @@ namespace KeePassHttp {
             string realm = null;
             var listResult = new List<PwEntryDatabase>();
             var url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
-            string formHost, searchHost;
+            string formHost, searchHost, submitUrl;
             formHost = searchHost = GetHost(url);
             string hostScheme = GetScheme(url);
             if (r.SubmitUrl != null) {
-                submitHost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+                submitUrl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                submitHost = GetHost(submitUrl);
+            } else
+            {
+                submitUrl = url;
             }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
@@ -181,6 +186,17 @@ namespace KeePassHttp {
                 var c = GetEntryConfig(e);
                 if (c != null)
                 {
+                    if (c.RegExp != null)
+                    { //user defined a regex for the pwd entry so we will use that for matching
+                        try
+                        {
+                            return Regex.IsMatch(submitUrl, c.RegExp);
+                        }
+                        catch (Exception)
+                        {
+                            ShowNotification(String.Format("WARNING: invalid RegExp pattern at entry:\n {0} \n RexExp will be ignored", title));
+                        }
+                    }
                     if (c.Allow.Contains(formHost) && (submitHost == null || c.Allow.Contains(submitHost)))
                         return true;
                     if (c.Deny.Contains(formHost) || (submitHost != null && c.Deny.Contains(submitHost)))
