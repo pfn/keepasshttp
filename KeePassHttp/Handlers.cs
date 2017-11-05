@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 using KeePass.Plugins;
 using KeePassLib.Collections;
@@ -120,11 +121,15 @@ namespace KeePassHttp {
             string realm = null;
             var listResult = new List<PwEntryDatabase>();
             var url = CryptoTransform(r.Url, true, false, aes, CMode.DECRYPT);
-            string formHost, searchHost;
+            string formHost, searchHost, submitUrl;
             formHost = searchHost = GetHost(url);
             string hostScheme = GetScheme(url);
             if (r.SubmitUrl != null) {
-                submitHost = GetHost(CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT));
+                submitUrl = CryptoTransform(r.SubmitUrl, true, false, aes, CMode.DECRYPT);
+                submitHost = GetHost(submitUrl);
+            } else
+            {
+                submitUrl = url;
             }
             if (r.Realm != null)
                 realm = CryptoTransform(r.Realm, true, false, aes, CMode.DECRYPT);
@@ -153,32 +158,57 @@ namespace KeePassHttp {
             int listCount = 0;
             foreach (PwDatabase db in listDatabases)
             {
-                searchHost = origSearchHost;
-                //get all possible entries for given host-name
-                while (listResult.Count == listCount && (origSearchHost == searchHost || searchHost.IndexOf(".") != -1))
+                parms.SearchString = ".*";
+                var listEntries = new PwObjectList<PwEntry>();
+                db.RootGroup.SearchEntries(parms, listEntries);
+                foreach (var le in listEntries)
                 {
-                    parms.SearchString = String.Format("^{0}$|/{0}/?", searchHost);
-                    var listEntries = new PwObjectList<PwEntry>();
-                    db.RootGroup.SearchEntries(parms, listEntries);
-                    foreach (var le in listEntries)
-                    {
-                        listResult.Add(new PwEntryDatabase(le, db));
-                    }
-                    searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
-                    
-                    //searchHost contains no dot --> prevent possible infinite loop
-                    if (searchHost == origSearchHost)
-                        break;
+                    listResult.Add(new PwEntryDatabase(le, db));
                 }
                 listCount = listResult.Count;
             }
-            
+
+            searchHost = origSearchHost;
+            List<string> hostNameRegExps = new List<string>();
+
+            do
+            {
+                hostNameRegExps.Add(String.Format("^{0}$|/{0}/?", searchHost));
+                searchHost = searchHost.Substring(searchHost.IndexOf(".") + 1);
+            } while (searchHost.IndexOf(".") != -1);
 
             Func<PwEntry, bool> filter = delegate(PwEntry e)
             {
                 var title = e.Strings.ReadSafe(PwDefs.TitleField);
                 var entryUrl = e.Strings.ReadSafe(PwDefs.UrlField);
                 var c = GetEntryConfig(e);
+                if (c != null && c.RegExp != null)
+                {
+                    try
+                    {
+                        return Regex.IsMatch(submitUrl, c.RegExp);
+                    }
+                    catch (Exception)
+                    {
+                        //ignore invalid pattern
+                    }
+                }
+                else
+                {
+                    bool found = false;
+                    foreach (string hostNameRegExp in hostNameRegExps)
+                    {
+                        if (Regex.IsMatch(e.Strings.ReadSafe("URL"), hostNameRegExp) || Regex.IsMatch(e.Strings.ReadSafe("Title"), hostNameRegExp) || Regex.IsMatch(e.Strings.ReadSafe("Notes"), hostNameRegExp))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        return false;
+                    }
+                }
                 if (c != null)
                 {
                     if (c.Allow.Contains(formHost) && (submitHost == null || c.Allow.Contains(submitHost)))
@@ -202,7 +232,7 @@ namespace KeePassHttp {
                     if (formHost.EndsWith(uHost))
                         return true;
                 }
-                return formHost.Contains(title) || (entryUrl != null && formHost.Contains(entryUrl));
+                return formHost.Contains(title) || (entryUrl != null && entryUrl != "" && formHost.Contains(entryUrl));
             };
 
             Func<PwEntry, bool> filterSchemes = delegate(PwEntry e)
@@ -355,8 +385,30 @@ namespace KeePassHttp {
                         entryUrl = entryDatabase.entry.Strings.ReadSafe(PwDefs.TitleField);
 
                     entryUrl = entryUrl.ToLower();
+                    var c = GetEntryConfig(entryDatabase.entry);
+                    ulong lDistance = (ulong)LevenshteinDistance(compareToUrl, entryUrl);
 
-                    entryDatabase.entry.UsageCount = (ulong)LevenshteinDistance(compareToUrl, entryUrl);
+                    //if the entry contains a matching RegExp get the matching part and calculate the minimal LevenshteinDistance metween the matches 
+                    if (c != null && c.RegExp != null)
+                    {
+                        try
+                        {
+                            MatchCollection matches = Regex.Matches(compareToUrl, c.RegExp);
+                            foreach(Match match in matches)
+                            {
+                                ulong matchDistance = (ulong)LevenshteinDistance(compareToUrl, match.Value); 
+                                if(matchDistance < lDistance)
+                                {
+                                    lDistance = matchDistance;
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            //ignore invalid pattern and fall back to the distance to entryUrl
+                        }
+                    }
+                    entryDatabase.entry.UsageCount = lDistance;
 
                 }
 

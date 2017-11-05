@@ -219,6 +219,7 @@ namespace KeePassHttp
     {
         public HashSet<string> Allow = new HashSet<string>();
         public HashSet<string> Deny = new HashSet<string>();
+        public string RegExp = null;
         public string Realm = null;
     }
 }
