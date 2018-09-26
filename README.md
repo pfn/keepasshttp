@@ -27,6 +27,10 @@ This plugin is primarily intended for use with [PassIFox for Mozilla Firefox](ht
  1. Install using [Chocolatey](https://chocolatey.org/) with `choco install keepass-keepasshttp`
  2. Restart KeePass if it is currently running to load the plugin
 
+## Arch Linux installation from the AUR
+
+ 1. Install the package `keepass-plugin-http` from the AUR.
+
 ## Non-Windows / Manual Windows installation
 
  1. Download [KeePassHttp](https://raw.github.com/pfn/keepasshttp/master/KeePassHttp.plgx)
@@ -193,13 +197,7 @@ If you want to develop new features or improve existing ones here is a way to bu
 3. delete the directory "obj" from sourcecode
 4. delete the file "KeePassHttp.dll"
 
-I use the following batch code to automatically do steps 2 - 4:
-
-	RD /S /Q C:\full-path-to-keepasshttp-source\bin
-	RD /S /Q C:\full-path-to-keepasshttp-source\obj
-	DEL C:\full-path-to-keepasshttp-source\KeePassHttp.dll
-	"C:\Program Files (x86)\KeePass Password Safe 2\keepass.exe" --plgx-create C:\full-path-to-keepasshttp-source
-
+Alternatively, use the respective shell scipts `build.sh` or `build.bat` to build automatically (Does not automate step 1 though, only 2-4).
 
 ## Protocol
 
@@ -242,7 +240,7 @@ Accept-Encoding: gzip, deflate, br
 
 Also, minimal JSON request (except that one without key set up) consists of four main parameters:
  - RequestType - `test-associate`, `associate`, `get-logins`, `get-logins-count`, `set-login`, ...
- - TriggerUnlock - TODO: what is this good for? seems always false
+ - TriggerUnlock - Trigger unlocking the database even if the respective plugin option is not set. Use only for one-time actions like registering the client etc.
  - Nonce - 128 bit (16 bytes) long random vector, base64 encoded, used as IV for aes encryption
  - Verifier - verifier, base64 encoded AES encrypted data: `encrypt(base64_encode($nonce), $key, $nonce);`
  - Id - Key id entered into KeePass GUI while  `associate`, not used during `associate`
