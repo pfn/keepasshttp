@@ -310,6 +310,7 @@ namespace KeePassHttp {
                         {
                             f.Icon = win.Icon;
                             f.Plugin = this;
+                            f.StartPosition = win.Visible ? FormStartPosition.CenterParent : FormStartPosition.CenterScreen;
                             f.Entries = (from e in items where filter(e.entry) select e.entry).ToList();
                             //f.Entries = needPrompting.ToList();
                             f.Host = submithost != null ? submithost : host;
