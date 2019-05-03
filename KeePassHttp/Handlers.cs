@@ -61,7 +61,7 @@ namespace KeePassHttp {
         private bool canShowBalloonTips()
         {
             // tray icon is not visible --> no balloon tips for it
-            if (Program.Config.UI.TrayIcon.ShowOnlyIfTrayed && !host.MainWindow.IsTrayed())
+            if (Program.Config.UI.TrayIcon.ShowOnlyIfTrayedEx && !host.MainWindow.IsTrayed())
             {
                 return false;
             }
